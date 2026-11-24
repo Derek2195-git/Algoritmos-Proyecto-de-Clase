@@ -1,4 +1,4 @@
-package com.example.proyectofinal_algoritmos.Modelo;
+package com.example.proyectofinal_algoritmos.Modelo.Ordenamientos;
 
 import java.util.Arrays;
 
