@@ -1,4 +1,4 @@
-Cpackage com.example.proyectofinal_algoritmos.Modelo;
+package com.example.proyectofinal_algoritmos.Modelo;
 
 public class ColaSimple<T> {
     T[] objetos;
