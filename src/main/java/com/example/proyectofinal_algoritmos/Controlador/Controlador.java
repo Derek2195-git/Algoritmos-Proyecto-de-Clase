@@ -11,7 +11,7 @@ public class Controlador {
     public Controlador(Stage stage) {
         this.stage = stage;
 
-        GrafoGUI grafo = new GrafoGUI(100, 100);
+        GrafoGUI grafo = new GrafoGUI(800, 600);
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1); ids.add(2); ids.add(3); ids.add(4);
         int[][] conexiones = { {1, 2, 100}, {2, 3, 80}, {3, 4, 120} };

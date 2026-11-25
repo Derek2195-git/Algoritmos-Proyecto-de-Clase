@@ -43,7 +43,7 @@ public class GrafoGUI {
             double angulo = 2 * Math.PI * i / n - Math.PI / 2;
             double x = centroX + radioCirculo * Math.cos(angulo);
             double y = centroY + radioCirculo * Math.sin(angulo);
-            vertices.put(ids.get(i), new VerticeGUI(ids.get(i), x, y, radioVertice));
+            vertices.put(ids.get(i), new VerticeGUI(ids.get(i), radioVertice, x, y));
         }
 
         // 2. Aristas primero, para que los vértices queden encima de las líneas
