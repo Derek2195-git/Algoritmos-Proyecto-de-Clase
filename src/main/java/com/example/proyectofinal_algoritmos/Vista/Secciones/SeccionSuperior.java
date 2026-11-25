@@ -6,6 +6,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Clase que modela la barra superior de controles de archivos, algoritmos y ventanas en la vista
+ * @version 25/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class SeccionSuperior {
     private VBox contenedor;
 
@@ -27,6 +32,9 @@ public class SeccionSuperior {
     private Button btnEjecutarOrdenamiento;
     private Button btnAnalisisEmpirico;
 
+    /**
+     * Constructor de la sección superior de controles
+     */
     public SeccionSuperior() {
         contenedor = new VBox(10);
         contenedor.setPadding(new Insets(12));
@@ -99,29 +107,109 @@ public class SeccionSuperior {
         contenedor.getChildren().addAll(filaArchivos, filaAlgoritmos);
     }
 
+    /**
+     * Getter del contenedor donde se ubica la sección superior
+     * @return Contenedor donde se está almacenando la sección
+     */
     public VBox getContenedor() {
         return contenedor;
     }
 
-    // Delegadores
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de cargar CSV
+     * @param accion Acción a realizar
+     */
     public void alCargarCSV(Runnable accion) { btnCargarCSV.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de guardar CSV
+     * @param accion Acción a realizar
+     */
     public void alGuardarCSV(Runnable accion) { btnGuardarCSV.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de generar grafo
+     * @param accion Acción a realizar
+     */
     public void alGenerarPrueba(Runnable accion) { btnGenerarPrueba.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al cambiar la selección de grafo dirigido
+     * @param accion Acción a realizar
+     */
     public void alCambiarDirigido(Runnable accion) { chkDirigido.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de ver grafo
+     * @param accion Acción a realizar
+     */
     public void alAbrirVentanaGrafo(Runnable accion) { btnAbrirVentanaGrafo.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de ejecutar búsqueda
+     * @param accion Acción a realizar
+     */
     public void alEjecutarBusqueda(Runnable accion) { btnEjecutarBusqueda.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de ordenar
+     * @param accion Acción a realizar
+     */
     public void alEjecutarOrdenamiento(Runnable accion) { btnEjecutarOrdenamiento.setOnAction(e -> accion.run()); }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de análisis empírico
+     * @param accion Acción a realizar
+     */
     public void alEjecutarAnalisisEmpirico(Runnable accion) { btnAnalisisEmpirico.setOnAction(e -> accion.run()); }
 
-    // Getters
+    /**
+     * Getter del texto ingresado en el campo de vértice inicial de búsqueda
+     * @return Texto del vértice inicial sin espacios en los extremos
+     */
     public String getTextoInicioBusqueda() { return txtInicioBusqueda.getText().trim(); }
+
+    /**
+     * Getter del texto ingresado en el campo de vértice destino para Dijkstra
+     * @return Texto del vértice destino sin espacios en los extremos
+     */
     public String getTextoFinBusqueda() { return txtFinBusqueda.getText().trim(); }
+
+    /**
+     * Getter del estado de la casilla de grafo dirigido
+     * @return true si está marcada la opción de grafo dirigido, false en caso contrario
+     */
     public boolean esDirigido() { return chkDirigido.isSelected(); }
+
+    /**
+     * Setter que cambia el estado de la casilla de grafo dirigido
+     * @param dirigido Boolean que indica si el grafo es dirigido
+     */
     public void setDirigido(boolean dirigido) { chkDirigido.setSelected(dirigido); }
+
+    /**
+     * Getter del texto ingresado con la cantidad de vértices a generar
+     * @return Texto numérico de la cantidad de vértices sin espacios en los extremos
+     */
     public String getTextoCantidadVertices() {
         return txtCantidadVertices.getText().trim();
     }
+
+    /**
+     * Getter del algoritmo de búsqueda seleccionado en el combo
+     * @return Nombre del algoritmo de búsqueda seleccionado
+     */
     public String getBusquedaSeleccionada() { return cmbAlgoritmoBusqueda.getValue(); }
+
+    /**
+     * Getter del algoritmo de ordenamiento seleccionado en el combo
+     * @return Nombre del algoritmo de ordenamiento seleccionado
+     */
     public String getOrdenamientoSeleccionado() { return cmbAlgoritmoOrdenamiento.getValue(); }
+
+    /**
+     * Getter del criterio de ordenamiento seleccionado en el combo
+     * @return Criterio de ordenamiento seleccionado
+     */
     public String getCriterioOrdenamiento() { return cmbCriterioOrdenamiento.getValue(); }
 }

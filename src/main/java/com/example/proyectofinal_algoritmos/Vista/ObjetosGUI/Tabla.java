@@ -2,7 +2,6 @@ package com.example.proyectofinal_algoritmos.Vista.ObjetosGUI;
 
 import com.example.proyectofinal_algoritmos.Modelo.Grafos.Arista;
 import com.example.proyectofinal_algoritmos.Modelo.Grafos.Grafo;
-import com.example.proyectofinal_algoritmos.Modelo.Grafos.Vertice;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,12 +11,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+/**
+ * Clase que modela la tabla de visualización de conexiones y matriz de adyacencia en la vista
+ * @version 25/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class Tabla {
     private TableView<ArrayList<String>> tablaView;
     private VBox contenedor;
 
+    /**
+     * Constructor de la tabla de visualización del grafo
+     */
     public Tabla() {
         tablaView = new TableView<>();
         tablaView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
@@ -27,14 +33,26 @@ public class Tabla {
         VBox.setVgrow(tablaView, Priority.ALWAYS);
     }
 
+    /**
+     * Getter del contenedor donde se ubica la tabla
+     * @return Contenedor donde se está almacenando la tabla
+     */
     public VBox getContenedor() {
         return contenedor;
     }
 
+    /**
+     * Metodo que muestra en la tabla todas las conexiones (aristas) del grafo recibido
+     * @param grafo Grafo del cual se obtendrán las aristas a mostrar
+     */
     public void mostrarConexiones(Grafo grafo) {
         mostrarAristasOrdenadas(grafo.obtenerAristas());
     }
 
+    /**
+     * Metodo que llena la tabla a partir de una lista específica de aristas
+     * @param aristas Lista de aristas a desplegar en las filas de la tabla
+     */
     public void mostrarAristasOrdenadas(ArrayList<Arista> aristas) {
         ArrayList<ArrayList<String>> filas = new ArrayList<>();
         for (int i = 0; i < aristas.size(); i++) {
@@ -48,6 +66,10 @@ public class Tabla {
         cargarFilasAristas(filas);
     }
 
+    /**
+     * Metodo auxiliar que configura las columnas de origen, destino y peso y carga las filas
+     * @param filas Lista de filas con los valores en texto de cada arista
+     */
     private void cargarFilasAristas(ArrayList<ArrayList<String>> filas) {
         tablaView.getColumns().clear();
 
@@ -67,6 +89,10 @@ public class Tabla {
         tablaView.setItems(datos);
     }
 
+    /**
+     * Metodo que construye dinámicamente las columnas y filas para mostrar la matriz de adyacencia del grafo
+     * @param grafo Grafo del cual se generará la matriz de adyacencia
+     */
     public void mostrarMatrizAdyacencia(Grafo grafo) {
         tablaView.getColumns().clear();
         ArrayList<Integer> ordenIds = grafo.getOrden();
@@ -99,5 +125,4 @@ public class Tabla {
         }
         tablaView.setItems(filas);
     }
-
 }

@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 /**
  * Clase que modela a un grafo en la pantalla
- * @version 23/11/2026
+ * @version 24/11/2026
  * @author Derek Ramón Garzón Vizcarra
  */
 public class GrafoGUI {

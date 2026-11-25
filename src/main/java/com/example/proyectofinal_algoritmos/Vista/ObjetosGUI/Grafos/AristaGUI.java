@@ -9,7 +9,7 @@ import javafx.scene.shape.Polygon;
 
 /**
  * Clase que representa a la arista de en la pantalla
- * @version 23/11/2026
+ * @version 24/11/2026
  * @author Derek Ramón Garzón Vizcarra
  */
 public class AristaGUI {

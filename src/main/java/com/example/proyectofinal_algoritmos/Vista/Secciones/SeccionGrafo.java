@@ -13,6 +13,11 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+/**
+ * Clase que modela la sección de visualización gráfica del grafo en la vista
+ * @version 25/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class SeccionGrafo {
     private VBox contenedor;
     private VBox contenedorGrafo;
@@ -20,6 +25,9 @@ public class SeccionGrafo {
     private Label lblEstadoGrafo;
     private GrafoGUI grafoGUI;
 
+    /**
+     * Constructor de la sección gráfica del grafo
+     */
     public SeccionGrafo() {
         contenedor = new VBox(8);
         contenedor.setPadding(new Insets(10));
@@ -43,10 +51,18 @@ public class SeccionGrafo {
         contenedor.getChildren().addAll(lblEstadoGrafo, scrollGrafo);
     }
 
+    /**
+     * Getter del contenedor donde se ubica la sección gráfica del grafo
+     * @return Contenedor donde se está almacenando la sección
+     */
     public VBox getContenedor() {
         return contenedor;
     }
 
+    /**
+     * Metodo que dibuja en pantalla un grafo que cumple con el límite visual de vértices
+     * @param grafo Grafo del cual se obtendrán los vértices y aristas a dibujar
+     */
     public void renderizarGrafoPequeno(Grafo grafo) {
         contenedorGrafo.getChildren().clear();
         lblEstadoGrafo.setText("Grafo: " + grafo.getNombre()
@@ -68,6 +84,10 @@ public class SeccionGrafo {
         contenedorGrafo.getChildren().add(grafoGUI.getContenedor());
     }
 
+    /**
+     * Metodo que muestra un mensaje de aviso cuando el grafo supera los 50 vértices permitidos
+     * @param totalVertices Cantidad total de vértices que posee el grafo actual
+     */
     public void mostrarMensajeGrafoGrande(int totalVertices) {
         contenedorGrafo.getChildren().clear();
         grafoGUI.limpiar();
@@ -79,14 +99,25 @@ public class SeccionGrafo {
         contenedorGrafo.getChildren().add(aviso);
     }
 
+    /**
+     * Metodo que resalta en el grafo dibujado una secuencia de vértices
+     * @param secuenciaVertices Lista ordenada con los identificadores de los vértices de la ruta
+     */
     public void resaltarRuta(ArrayList<Integer> secuenciaVertices) {
         grafoGUI.resaltarRuta(secuenciaVertices);
     }
 
+    /**
+     * Metodo que asigna la acción a realizar cuando se hace clic sobre un vértice dibujado
+     * @param accion Acción que recibe el identificador entero del vértice seleccionado
+     */
     public void alSeleccionarVertice(Consumer<Integer> accion) {
         grafoGUI.alHacerClicVertice(accion);
     }
 
+    /**
+     * Metodo que limpia el área de dibujo y restablece el texto de estado
+     */
     public void limpiar() {
         contenedorGrafo.getChildren().clear();
         grafoGUI.limpiar();

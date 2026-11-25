@@ -9,6 +9,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+/**
+ * Clase que modela la sección inferior de salida de resultados y análisis en la vista
+ * @version 25/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class SeccionResultados {
     private VBox contenedor;
     private Label lblTitulo;
@@ -16,6 +21,9 @@ public class SeccionResultados {
     private Button btnVerComplejidad;
     private Button btnLimpiar;
 
+    /**
+     * Constructor de la sección de resultados y análisis
+     */
     public SeccionResultados() {
         contenedor = new VBox(8);
         contenedor.setPadding(new Insets(10));
@@ -40,14 +48,26 @@ public class SeccionResultados {
         contenedor.getChildren().addAll(barraSuperior, areaResultados);
     }
 
+    /**
+     * Getter del contenedor donde se ubica la sección de resultados
+     * @return Contenedor donde se está almacenando la sección
+     */
     public VBox getContenedor() {
         return contenedor;
     }
 
+    /**
+     * Metodo que reemplaza el contenido del área de resultados con un nuevo texto
+     * @param texto Texto a mostrar en el área de resultados
+     */
     public void mostrarTexto(String texto) {
         areaResultados.setText(texto);
     }
 
+    /**
+     * Metodo que añade una nueva línea de texto al final del área de resultados sin borrar lo anterior
+     * @param texto Texto adicional a concatenar en el área de resultados
+     */
     public void agregarTexto(String texto) {
         if (areaResultados.getText().isEmpty()) {
             areaResultados.setText(texto);
@@ -56,15 +76,25 @@ public class SeccionResultados {
         }
     }
 
+    /**
+     * Metodo que borra todo el texto contenido en el área de resultados
+     */
     public void limpiar() {
         areaResultados.clear();
     }
 
-    // Métodos delegadores para el Controlador
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de complejidad teórica
+     * @param accion Acción a realizar
+     */
     public void alVerComplejidad(Runnable accion) {
         btnVerComplejidad.setOnAction(e -> accion.run());
     }
 
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de limpiar
+     * @param accion Acción a realizar
+     */
     public void alLimpiar(Runnable accion) {
         btnLimpiar.setOnAction(e -> accion.run());
     }

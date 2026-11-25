@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle;
 
 /**
  * Clase que modela a vertice en la vista
- * @version 23/11/2026
+ * @version 24/11/2026
  * @author Derek Ramón Garzón Vizcarra
  */
 public class VerticeGUI {

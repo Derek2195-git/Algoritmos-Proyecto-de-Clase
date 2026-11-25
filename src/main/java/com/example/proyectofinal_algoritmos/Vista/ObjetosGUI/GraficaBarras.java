@@ -9,6 +9,11 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
+/**
+ * Clase que modela la gráfica de barras para el análisis empírico en la vista
+ * @version 25/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class GraficaBarras {
     private BarChart<String, Number> grafica;
     private CategoryAxis ejeX;
@@ -17,7 +22,7 @@ public class GraficaBarras {
 
     /**
      * Constructor de la gráfica de barras
-     * @param titulo
+     * @param titulo Título que se mostrará en la parte superior de la gráfica
      */
     public GraficaBarras(String titulo) {
         ejeX = new CategoryAxis();
@@ -35,10 +40,18 @@ public class GraficaBarras {
         contenedor = new VBox(grafica);
     }
 
+    /**
+     * Getter del contenedor donde se ubica la gráfica de barras
+     * @return Contenedor donde se está almacenando la gráfica
+     */
     public VBox getContenedor() {
         return contenedor;
     }
 
+    /**
+     * Metodo que actualiza la gráfica con una serie individual de mediciones de tiempo
+     * @param mediciones Lista de mediciones registradas a graficar
+     */
     public void actualizarDatos(ArrayList<Medicion> mediciones) {
         grafica.getData().clear();
         if (mediciones == null || mediciones.isEmpty()) {
@@ -55,6 +68,13 @@ public class GraficaBarras {
         grafica.getData().add(serie);
     }
 
+    /**
+     * Metodo que actualiza la gráfica comparando dos series de mediciones de distintos algoritmos
+     * @param nombreSerie1 Nombre identificador de la primera serie
+     * @param s1 Lista de mediciones correspondientes al primer algoritmo
+     * @param nombreSerie2 Nombre identificador de la segunda serie
+     * @param s2 Lista de mediciones correspondientes al segundo algoritmo
+     */
     public void actualizarComparativa(String nombreSerie1, ArrayList<Medicion> s1,
                                       String nombreSerie2, ArrayList<Medicion> s2) {
         grafica.getData().clear();
@@ -77,6 +97,9 @@ public class GraficaBarras {
         grafica.getData().addAll(serie1, serie2);
     }
 
+    /**
+     * Metodo que limpia todos los datos dibujados actualmente en la gráfica
+     */
     public void limpiar() {
         grafica.getData().clear();
     }
