@@ -53,24 +53,16 @@ public class VentanaAnalisis {
         }
     }
 
-    /**
-     * Metodo que actualiza la gráfica de barras con una serie individual de mediciones
-     * @param mediciones Lista de mediciones registradas a graficar
-     */
-    public void actualizarDatos(ArrayList<Medicion> mediciones) {
-        graficaBarras.actualizarDatos(mediciones);
+
+    public void actualizarDatos(ArrayList<String> etiquetas, ArrayList<Double> valores) {
+        graficaBarras.actualizarDatos(etiquetas, valores);
     }
 
-    /**
-     * Metodo que actualiza la gráfica de barras comparando dos series de distintos algoritmos
-     * @param nombre1 Nombre identificador de la primera serie
-     * @param serie1 Lista de mediciones correspondientes al primer algoritmo
-     * @param nombre2 Nombre identificador de la segunda serie
-     * @param serie2 Lista de mediciones correspondientes al segundo algoritmo
-     */
-    public void actualizarComparativa(String nombre1, ArrayList<Medicion> serie1,
-                                      String nombre2, ArrayList<Medicion> serie2) {
-        graficaBarras.actualizarComparativa(nombre1, serie1, nombre2, serie2);
+
+    public void actualizarComparativa(ArrayList<String> etiquetas,
+                                      String nombre1, ArrayList<Double> valores1,
+                                      String nombre2, ArrayList<Double> valores2) {
+        graficaBarras.actualizarComparativa(etiquetas, nombre1, valores1, nombre2, valores2);
     }
 
     /**

@@ -41,29 +41,26 @@ public class Tabla {
         return contenedor;
     }
 
-    /**
-     * Metodo que muestra en la tabla todas las conexiones (aristas) del grafo recibido
-     * @param grafo Grafo del cual se obtendrán las aristas a mostrar
-     */
-    public void mostrarConexiones(Grafo grafo) {
-        mostrarAristasOrdenadas(grafo.obtenerAristas());
+
+    public void mostrarConexiones(ArrayList<ArrayList<String>> filas) {
+        cargarFilasAristas(filas);
     }
 
-    /**
-     * Metodo que llena la tabla a partir de una lista específica de aristas
-     * @param aristas Lista de aristas a desplegar en las filas de la tabla
-     */
-    public void mostrarAristasOrdenadas(ArrayList<Arista> aristas) {
-        ArrayList<ArrayList<String>> filas = new ArrayList<>();
-        for (int i = 0; i < aristas.size(); i++) {
-            Arista a = aristas.get(i);
-            ArrayList<String> fila = new ArrayList<>();
-            fila.add(String.valueOf(a.getOrigen()));
-            fila.add(String.valueOf(a.getDestino()));
-            fila.add(String.valueOf(a.getPeso()));
-            filas.add(fila);
-        }
-        cargarFilasAristas(filas);
+
+    public void mostrarListaAdyacencia(ArrayList<ArrayList<String>> filas) {
+        tablaView.getColumns().clear();
+
+        TableColumn<ArrayList<String>, String> colVertice = new TableColumn<>("Vértice");
+        colVertice.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(0)));
+
+        TableColumn<ArrayList<String>, String> colConexiones = new TableColumn<>("Conexiones (vecino: peso)");
+        colConexiones.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(1)));
+
+        tablaView.getColumns().addAll(colVertice, colConexiones);
+
+        ObservableList<ArrayList<String>> datos = FXCollections.observableArrayList();
+        datos.addAll(filas);
+        tablaView.setItems(datos);
     }
 
     /**
@@ -89,40 +86,22 @@ public class Tabla {
         tablaView.setItems(datos);
     }
 
-    /**
-     * Metodo que construye dinámicamente las columnas y filas para mostrar la matriz de adyacencia del grafo
-     * @param grafo Grafo del cual se generará la matriz de adyacencia
-     */
-    public void mostrarMatrizAdyacencia(Grafo grafo) {
+    public void mostrarMatriz(ArrayList<Integer> ids, ArrayList<ArrayList<String>> filas) {
         tablaView.getColumns().clear();
-        ArrayList<Integer> ordenIds = grafo.getOrden();
-        int[][] matriz = grafo.crearMatrizAdyacencia();
 
         TableColumn<ArrayList<String>, String> colCabecera = new TableColumn<>("Vértice");
         colCabecera.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(0)));
         tablaView.getColumns().add(colCabecera);
 
-        for (int j = 0; j < ordenIds.size(); j++) {
+        for (int j = 0; j < ids.size(); j++) {
             final int indiceColumna = j + 1;
-            TableColumn<ArrayList<String>, String> col = new TableColumn<>(String.valueOf(ordenIds.get(j)));
+            TableColumn<ArrayList<String>, String> col = new TableColumn<>(String.valueOf(ids.get(j)));
             col.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(indiceColumna)));
             tablaView.getColumns().add(col);
         }
 
-        ObservableList<ArrayList<String>> filas = FXCollections.observableArrayList();
-        for (int i = 0; i < ordenIds.size(); i++) {
-            ArrayList<String> fila = new ArrayList<>();
-            fila.add(String.valueOf(ordenIds.get(i)));
-            for (int j = 0; j < ordenIds.size(); j++) {
-                int val = matriz[i][j];
-                if (val == -1) {
-                    fila.add("-");
-                } else {
-                    fila.add(String.valueOf(val));
-                }
-            }
-            filas.add(fila);
-        }
-        tablaView.setItems(filas);
+        ObservableList<ArrayList<String>> datos = FXCollections.observableArrayList();
+        datos.addAll(filas);
+        tablaView.setItems(datos);
     }
 }

@@ -48,52 +48,38 @@ public class GraficaBarras {
         return contenedor;
     }
 
-    /**
-     * Metodo que actualiza la gráfica con una serie individual de mediciones de tiempo
-     * @param mediciones Lista de mediciones registradas a graficar
-     */
-    public void actualizarDatos(ArrayList<Medicion> mediciones) {
+
+    public void actualizarDatos(ArrayList<String> etiquetas, ArrayList<Double> valores) {
         grafica.getData().clear();
-        if (mediciones == null || mediciones.isEmpty()) {
+        if (etiquetas == null || valores == null || etiquetas.isEmpty()) {
             return;
         }
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         serie.setName("Tiempo de ejecución (ms)");
-
-        for (Medicion m : mediciones) {
-            String etiqueta = m.getAlgoritmo() + " (" + m.getTamanio() + "v)";
-            serie.getData().add(new XYChart.Data<>(etiqueta, m.getTiempoMilisegundos()));
+        for (int i = 0; i < etiquetas.size(); i++) {
+            serie.getData().add(new XYChart.Data<>(etiquetas.get(i), valores.get(i)));
         }
         grafica.getData().add(serie);
     }
 
-    /**
-     * Metodo que actualiza la gráfica comparando dos series de mediciones de distintos algoritmos
-     * @param nombreSerie1 Nombre identificador de la primera serie
-     * @param s1 Lista de mediciones correspondientes al primer algoritmo
-     * @param nombreSerie2 Nombre identificador de la segunda serie
-     * @param s2 Lista de mediciones correspondientes al segundo algoritmo
-     */
-    public void actualizarComparativa(String nombreSerie1, ArrayList<Medicion> s1,
-                                      String nombreSerie2, ArrayList<Medicion> s2) {
+    public void actualizarComparativa(ArrayList<String> etiquetas,
+                                      String nombreSerie1, ArrayList<Double> valores1,
+                                      String nombreSerie2, ArrayList<Double> valores2) {
         grafica.getData().clear();
-        if (s1 == null || s2 == null) {
+        if (etiquetas == null || valores1 == null || valores2 == null) {
             return;
         }
 
         XYChart.Series<String, Number> serie1 = new XYChart.Series<>();
         serie1.setName(nombreSerie1);
-        for (Medicion m : s1) {
-            serie1.getData().add(new XYChart.Data<>(m.getTamanio() + " vértices", m.getTiempoMilisegundos()));
-        }
-
         XYChart.Series<String, Number> serie2 = new XYChart.Series<>();
         serie2.setName(nombreSerie2);
-        for (Medicion m : s2) {
-            serie2.getData().add(new XYChart.Data<>(m.getTamanio() + " vértices", m.getTiempoMilisegundos()));
-        }
 
+        for (int i = 0; i < etiquetas.size(); i++) {
+            serie1.getData().add(new XYChart.Data<>(etiquetas.get(i), valores1.get(i)));
+            serie2.getData().add(new XYChart.Data<>(etiquetas.get(i), valores2.get(i)));
+        }
         grafica.getData().addAll(serie1, serie2);
     }
 

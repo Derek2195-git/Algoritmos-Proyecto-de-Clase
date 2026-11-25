@@ -59,28 +59,15 @@ public class SeccionGrafo {
         return contenedor;
     }
 
-    /**
-     * Metodo que dibuja en pantalla un grafo que cumple con el límite visual de vértices
-     * @param grafo Grafo del cual se obtendrán los vértices y aristas a dibujar
-     */
-    public void renderizarGrafoPequeno(Grafo grafo) {
+
+    public void renderizarGrafoPequeno(String nombre, ArrayList<Integer> ids,
+                                       int[][] conexiones, boolean dirigido) {
         contenedorGrafo.getChildren().clear();
-        lblEstadoGrafo.setText("Grafo: " + grafo.getNombre()
-                + " (" + grafo.cantidadVertices() + " vértices, "
-                + grafo.cantidadAristas() + " aristas)");
+        lblEstadoGrafo.setText("Grafo: " + nombre
+                + " (" + ids.size() + " vértices, "
+                + conexiones.length + " aristas)");
 
-        ArrayList<Integer> ids = grafo.obtenerIds();
-        ArrayList<Arista> listaAristas = grafo.obtenerAristas();
-        int[][] conexiones = new int[listaAristas.size()][3];
-
-        for (int i = 0; i < listaAristas.size(); i++) {
-            Arista a = listaAristas.get(i);
-            conexiones[i][0] = a.getOrigen();
-            conexiones[i][1] = a.getDestino();
-            conexiones[i][2] = a.getPeso();
-        }
-
-        grafoGUI.dibujar(ids, conexiones, grafo.isDirigido());
+        grafoGUI.dibujar(ids, conexiones, dirigido);
         contenedorGrafo.getChildren().add(grafoGUI.getContenedor());
     }
 

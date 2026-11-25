@@ -44,6 +44,7 @@ public class Controlador {
         ventana.getVentanaGrafo().alModificarPeso(this::manejarModificarPeso);
         ventana.getVentanaGrafo().alEliminarArista(this::manejarEliminarArista);
         ventana.getVentanaGrafo().alSeleccionarVertice(this::manejarSeleccionVertice);
+        ventana.getVentanaGrafo().alVerListaAdyacencia(this::manejarVerListaAdyacencia);
     }
 
     // Seccion de arriba
@@ -176,6 +177,15 @@ public class Controlador {
      * @param valor identificador entero del vértice seleccionado
      */
     private void manejarSeleccionVertice(int valor) {
+
+    }
+
+    /**
+     * Maneja la seleccion del boton de ver la lista de adyacencia, debe mostrar en la
+     * tabla la lista de adyacencia del grafo que esta activo actualmente, tambien deberia
+     * actualizarse el titulo de la sección de la gráfica
+     */
+    private void manejarVerListaAdyacencia() {
 
     }
 }

@@ -35,6 +35,7 @@ public class VentanaGrafo {
     private Button btnAgregarArista;
     private Button btnModificarPeso;
     private Button btnEliminarArista;
+    private Button btnVerListaAdyacencia;
 
     // Controles de estructura en tabla principal
     private Button btnVerConexiones;
@@ -81,15 +82,18 @@ public class VentanaGrafo {
 
         // Fila 2: Estructura del grafo
         btnVerConexiones = new Button("Ver Conexiones en Tabla");
+        btnVerListaAdyacencia = new Button("Ver Lista de Adyacencia en Tabla");
         btnVerMatriz = new Button("Ver Matriz de Adyacencia en Tabla");
 
         HBox filaEstructura = new HBox(10,
                 new Label("Estructura del Grafo:"),
                 btnVerConexiones,
-                new Separator(),
+                btnVerListaAdyacencia,
                 btnVerMatriz
         );
         filaEstructura.setAlignment(Pos.CENTER_LEFT);
+
+
 
         // Área gráfica del grafo
         seccionGrafo = new SeccionGrafo();
@@ -136,12 +140,10 @@ public class VentanaGrafo {
         }
     }
 
-    /**
-     * Metodo que dibuja en la sección gráfica un grafo dentro del límite de 50 vértices
-     * @param grafo Grafo a representar visualmente
-     */
-    public void mostrarGrafoPequeno(Grafo grafo) {
-        seccionGrafo.renderizarGrafoPequeno(grafo);
+
+    public void mostrarGrafoPequeno(String nombre, ArrayList<Integer> ids,
+                                    int[][] conexiones, boolean dirigido) {
+        seccionGrafo.renderizarGrafoPequeno(nombre, ids, conexiones, dirigido);
     }
 
     /**
@@ -195,6 +197,8 @@ public class VentanaGrafo {
      * @param accion Acción a realizar
      */
     public void alVerConexiones(Runnable accion) { btnVerConexiones.setOnAction(e -> accion.run()); }
+
+    public void alVerListaAdyacencia(Runnable accion) { btnVerListaAdyacencia.setOnAction(e -> accion.run()); }
 
     /**
      * Metodo que asigna la acción a realizar al presionar el botón de ver matriz de adyacencia
