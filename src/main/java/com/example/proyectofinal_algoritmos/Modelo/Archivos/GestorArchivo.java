@@ -29,6 +29,25 @@ public class GestorArchivo {
     }
 
     /**
+     * Lee y valida un CSV y construye el grafo con los registros válidos.
+     * @param archivo archivo CSV a importar
+     * @param dirigido si el grafo será dirigido
+     * @return resultado con el grafo, el mapa de nombres, errores y tiempos
+     */
+    public ResultadoImportacion importarGrafo(File archivo, boolean dirigido) {
+        long inicioLectura = System.nanoTime();
+        ResultadoImportacion resultado = leerConexiones(archivo, dirigido);
+        resultado.setTiempoLecturaNs(System.nanoTime() - inicioLectura);
+
+        if (resultado.isEncabezadoValido() && !resultado.getConexionesValidas().isEmpty()) {
+            long inicioConstruccion = System.nanoTime();
+            generador.construir(resultado, obtenerNombreSinExtension(archivo));
+            resultado.setTiempoConstruccionNs(System.nanoTime() - inicioConstruccion);
+        }
+        return resultado;
+    }
+
+    /**
      * Lee y valida un CSV sin construir el grafo.
      * @param archivo archivo CSV
      * @param dirigido si el grafo es dirigido (afecta la detección de duplicados)
@@ -341,5 +360,23 @@ public class GestorArchivo {
         String nombre = archivo.getName();
         int punto = nombre.lastIndexOf('.');
         return punto > 0 ? nombre.substring(0, punto) : nombre;
+    }
+
+    /**
+     * Escribe un archivo de texto con un encabezado y una línea por fila.
+     * @param archivo archivo destino
+     * @param encabezado primera línea del archivo
+     * @param lineas líneas a escribir
+     * @throws IOException si no se puede escribir el archivo
+     */
+    public void escribirLineas(File archivo, String encabezado, ArrayList<String> lineas) throws IOException {
+        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo, StandardCharsets.UTF_8))) {
+            escritor.write(encabezado);
+            escritor.newLine();
+            for (int i = 0; i < lineas.size(); i++) {
+                escritor.write(lineas.get(i));
+                escritor.newLine();
+            }
+        }
     }
 }

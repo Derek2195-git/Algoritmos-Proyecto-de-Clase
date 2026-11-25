@@ -1,6 +1,12 @@
 package com.example.proyectofinal_algoritmos.Modelo.Analisis;
 
+import com.example.proyectofinal_algoritmos.Modelo.Archivos.GestorArchivo;
+import com.example.proyectofinal_algoritmos.Modelo.Archivos.ResultadoImportacion;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -8,6 +14,10 @@ import java.util.function.Supplier;
  * Mide tiempos de ejecución de los algoritmos y guarda las mediciones.
  */
 public class MedidorTiempos {
+    public static final String LECTURA_CSV = "Lectura CSV";
+    public static final String CONSTRUCCION_GRAFO = "Construcción grafo";
+    public static final String IMPORTACION_TOTAL = "Importación total";
+
     private final ArrayList<Medicion> mediciones;
     private int repeticionesPorDefecto;
     private int calentamiento;
@@ -52,7 +62,7 @@ public class MedidorTiempos {
     }
 
     /**
-     * Mide una tarea que necesita datos nuevos en cada repetición (por ejemplo un ordenamiento).
+     * Mide una tarea que necesita datos nuevos en cada repetición.
      * @param algoritmo nombre del algoritmo
      * @param tamanio tamaño de los datos
      * @param datos descripción del conjunto de datos
@@ -83,8 +93,59 @@ public class MedidorTiempos {
         return m;
     }
 
+    /**
+     * Mide por separado la lectura del CSV, la construcción del grafo y la importación total.
+     * @param gestor gestor de archivos
+     * @param archivo archivo CSV a importar
+     * @param dirigido si el grafo es dirigido
+     * @param repeticiones veces que se importa el archivo para promediar
+     * @return las tres mediciones registradas, o lista vacía si el archivo no es válido
+     */
+    public ArrayList<Medicion> medirImportacion(GestorArchivo gestor, File archivo,
+                                                boolean dirigido, int repeticiones) {
+        ArrayList<Medicion> nuevas = new ArrayList<>();
+        if (repeticiones < 1) {
+            repeticiones = 1;
+        }
+
+        ResultadoImportacion prueba = null;
+        for (int i = 0; i < Math.max(1, calentamiento); i++) {
+            prueba = gestor.importarGrafo(archivo, dirigido);
+        }
+        if (prueba == null || !prueba.esExitosa()) {
+            return nuevas;
+        }
+
+        String nombreGrafo = GestorArchivo.obtenerNombreSinExtension(archivo);
+        long totalLectura = 0;
+        long totalConstruccion = 0;
+        for (int i = 0; i < repeticiones; i++) {
+            long inicio = System.nanoTime();
+            ResultadoImportacion r = gestor.leerConexiones(archivo, dirigido);
+            long finLectura = System.nanoTime();
+            gestor.getGenerador().construir(r, nombreGrafo);
+            long finConstruccion = System.nanoTime();
+            totalLectura += finLectura - inicio;
+            totalConstruccion += finConstruccion - finLectura;
+        }
+
+        int tamanio = prueba.getNumAristas();
+        String datos = archivo.getName() + " (V=" + prueba.getNumVertices()
+                + ", E=" + prueba.getNumAristas() + ")";
+        long lectura = totalLectura / repeticiones;
+        long construccion = totalConstruccion / repeticiones;
+
+        nuevas.add(new Medicion(LECTURA_CSV, tamanio, lectura, repeticiones, datos));
+        nuevas.add(new Medicion(CONSTRUCCION_GRAFO, tamanio, construccion, repeticiones, datos));
+        nuevas.add(new Medicion(IMPORTACION_TOTAL, tamanio, lectura + construccion, repeticiones, datos));
+        mediciones.addAll(nuevas);
+        return nuevas;
+    }
+
     public void agregar(Medicion medicion) {
-        if (medicion != null) mediciones.add(medicion);
+        if (medicion != null) {
+            mediciones.add(medicion);
+        }
     }
 
     public ArrayList<Medicion> getMediciones() {
@@ -99,7 +160,9 @@ public class MedidorTiempos {
     public ArrayList<Medicion> filtrarPorAlgoritmo(String algoritmo) {
         ArrayList<Medicion> resultado = new ArrayList<>();
         for (int i = 0; i < mediciones.size(); i++) {
-            if (mediciones.get(i).getAlgoritmo().equals(algoritmo)) resultado.add(mediciones.get(i));
+            if (mediciones.get(i).getAlgoritmo().equals(algoritmo)) {
+                resultado.add(mediciones.get(i));
+            }
         }
         return resultado;
     }
@@ -112,7 +175,9 @@ public class MedidorTiempos {
         ArrayList<String> nombres = new ArrayList<>();
         for (int i = 0; i < mediciones.size(); i++) {
             String nombre = mediciones.get(i).getAlgoritmo();
-            if (!nombres.contains(nombre)) nombres.add(nombre);
+            if (!nombres.contains(nombre)) {
+                nombres.add(nombre);
+            }
         }
         return nombres;
     }
@@ -135,6 +200,41 @@ public class MedidorTiempos {
 
     public void setCalentamiento(int calentamiento) {
         this.calentamiento = Math.max(0, calentamiento);
+    }
+
+    /**
+     * Genera una tabla de texto con todas las mediciones.
+     * @return tabla de mediciones
+     */
+    public String generarTabla() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%-22s %10s %14s %6s  %s%n", "Algoritmo", "Tamaño", "Tiempo (ms)", "Reps", "Datos"));
+        sb.append("-".repeat(80)).append('\n');
+        for (int i = 0; i < mediciones.size(); i++) {
+            Medicion m = mediciones.get(i);
+            sb.append(String.format(Locale.US, "%-22s %10d %14.4f %6d  %s%n",
+                    m.getAlgoritmo(), m.getTamanio(), m.getTiempoMilisegundos(),
+                    m.getRepeticiones(), m.getDatos()));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Exporta las mediciones a un archivo CSV.
+     * @param gestor gestor de archivos que escribe el archivo
+     * @param archivo archivo destino
+     * @throws IOException si no se puede escribir el archivo
+     */
+    public void exportarCSV(GestorArchivo gestor, File archivo) throws IOException {
+        ArrayList<String> lineas = new ArrayList<>();
+        for (int i = 0; i < mediciones.size(); i++) {
+            Medicion m = mediciones.get(i);
+            lineas.add(GestorArchivo.escaparCampo(m.getAlgoritmo()) + "," + m.getTamanio() + ","
+                    + m.getTiempoNanos() + ","
+                    + String.format(Locale.US, "%.4f", m.getTiempoMilisegundos()) + ","
+                    + m.getRepeticiones() + "," + GestorArchivo.escaparCampo(m.getDatos()));
+        }
+        gestor.escribirLineas(archivo, "algoritmo,tamanio,tiempo_ns,tiempo_ms,repeticiones,datos", lineas);
     }
 
 }
