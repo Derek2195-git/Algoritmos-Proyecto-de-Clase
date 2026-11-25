@@ -11,6 +11,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class SeccionGrafo {
     private VBox contenedor;
@@ -80,6 +81,10 @@ public class SeccionGrafo {
 
     public void resaltarRuta(ArrayList<Integer> secuenciaVertices) {
         grafoGUI.resaltarRuta(secuenciaVertices);
+    }
+
+    public void alSeleccionarVertice(Consumer<Integer> accion) {
+        grafoGUI.alHacerClicVertice(accion);
     }
 
     public void limpiar() {

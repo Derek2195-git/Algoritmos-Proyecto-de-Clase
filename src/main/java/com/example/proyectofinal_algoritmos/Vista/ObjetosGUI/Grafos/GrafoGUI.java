@@ -4,6 +4,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class GrafoGUI {
     private Pane contenedor;
@@ -11,6 +12,7 @@ public class GrafoGUI {
     private double alto;
     private HashMap<Integer, VerticeGUI> vertices;
     private HashMap<String, AristaGUI> aristas;
+    private Consumer<Integer> accionClicVertice;
 
     public GrafoGUI(double ancho, double alto) {
         this.ancho = ancho;
@@ -44,6 +46,15 @@ public class GrafoGUI {
             double x = centroX + radioCirculo * Math.cos(angulo);
             double y = centroY + radioCirculo * Math.sin(angulo);
             vertices.put(ids.get(i), new VerticeGUI(ids.get(i), radioVertice, x, y));
+
+            int idActual = ids.get(i);
+            VerticeGUI vGui = new VerticeGUI(idActual, radioVertice, x, y);
+            vGui.alHacerClic(() -> {
+                if (accionClicVertice != null) {
+                    accionClicVertice.accept(idActual);
+                }
+            });
+            vertices.put(idActual, vGui);
         }
 
         // 2. Aristas primero, para que los vértices queden encima de las líneas
@@ -99,5 +110,9 @@ public class GrafoGUI {
         for (AristaGUI arista : aristas.values()) {
             arista.resaltar(false);
         }
+    }
+
+    public void alHacerClicVertice(Consumer<Integer> accion) {
+        this.accionClicVertice = accion;
     }
 }

@@ -5,33 +5,101 @@ import com.example.proyectofinal_algoritmos.Modelo.Grafos.Grafo;
 import com.example.proyectofinal_algoritmos.Vista.ObjetosGUI.GraficaBarras;
 import com.example.proyectofinal_algoritmos.Vista.Secciones.SeccionGrafo;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class VentanaGrafo {
     private Stage ventana;
     private VBox contenedor;
-    private SeccionGrafo seccionGrafica;
-    private GraficaBarras graficaBarras;
 
-    public VentanaGrafo() {
-        contenedor = new VBox(12);
-        contenedor.setPadding(new Insets(8));
+    // Controles de creación y edición manual
+    private TextField txtOrigen;
+    private TextField txtDestino;
+    private TextField txtPeso;
+    private Button btnAgregarVertice;
+    private Button btnEliminarVertice;
+    private Button btnAgregarArista;
+    private Button btnModificarPeso;
+    private Button btnEliminarArista;
+
+    // Controles de estructura en tabla principal
+    private Button btnVerConexiones;
+    private Button btnVerMatriz;
+
+    // Dibujo del grafo
+    private SeccionGrafo seccionGrafo;
+
+    public VentanaGrafo(Stage owner) {
+        contenedor = new VBox(10);
+        contenedor.setPadding(new Insets(12));
         contenedor.getStyleClass().add("ventana-grafo");
 
-        seccionGrafica = new SeccionGrafo();
-        VBox.setVgrow(seccionGrafica.getContenedor(), Priority.ALWAYS);
+        // Fila 1: Edición de vértices y aristas
+        txtOrigen = new TextField();
+        txtOrigen.setPromptText("Origen");
+        txtOrigen.setPrefWidth(90);
 
-        graficaBarras = new GraficaBarras("Analisis Empirico");
+        txtDestino = new TextField();
+        txtDestino.setPromptText("Destino");
+        txtDestino.setPrefWidth(90);
 
-        contenedor.getChildren().addAll(seccionGrafica.getContenedor(), graficaBarras.getContenedor());
+        txtPeso = new TextField();
+        txtPeso.setPromptText("Peso");
+        txtPeso.setPrefWidth(75);
+
+        btnAgregarVertice = new Button("+ Vértice");
+        btnEliminarVertice = new Button("- Vértice");
+        btnAgregarArista = new Button("+ Arista");
+        btnModificarPeso = new Button("Modificar Peso");
+        btnEliminarArista = new Button("- Arista");
+
+        HBox filaEdicion = new HBox(8,
+                new Label("Edición:"),
+                txtOrigen, txtDestino, txtPeso,
+                btnAgregarVertice, btnEliminarVertice,
+                btnAgregarArista, btnModificarPeso, btnEliminarArista
+        );
+        filaEdicion.setAlignment(Pos.CENTER_LEFT);
+
+        // Fila 2: Estructura del grafo
+        btnVerConexiones = new Button("Ver Conexiones en Tabla");
+        btnVerMatriz = new Button("Ver Matriz de Adyacencia en Tabla");
+
+        HBox filaEstructura = new HBox(10,
+                new Label("Estructura del Grafo:"),
+                btnVerConexiones,
+                new Separator(),
+                btnVerMatriz
+        );
+        filaEstructura.setAlignment(Pos.CENTER_LEFT);
+
+        // Área gráfica del grafo
+        seccionGrafo = new SeccionGrafo();
+        VBox.setVgrow(seccionGrafo.getContenedor(), Priority.ALWAYS);
+
+        contenedor.getChildren().addAll(
+                filaEdicion,
+                filaEstructura,
+                seccionGrafo.getContenedor()
+        );
+
         ventana = new Stage();
-        ventana.setTitle("Grafos y Graficas de tiempos");
-        ventana.setScene(new Scene(contenedor, 800, 600));
+        if (owner != null) {
+            ventana.initOwner(owner);
+        }
+        ventana.setTitle("Gestión y Visualización del Grafo");
+        ventana.setScene(new Scene(contenedor, 920, 540));
     }
 
     public VBox getContenedor() {
@@ -39,11 +107,7 @@ public class VentanaGrafo {
     }
 
     public SeccionGrafo getSeccionGrafica() {
-        return seccionGrafica;
-    }
-
-    public GraficaBarras getGraficaBarras() {
-        return graficaBarras;
+        return seccionGrafo;
     }
 
     public void mostrar() {
@@ -54,35 +118,51 @@ public class VentanaGrafo {
         }
     }
 
-    public void cerrar() {
-        if (ventana.isShowing()) {
-            ventana.close();
-        }
-    }
-
     public void mostrarGrafoPequeno(Grafo grafo) {
-        seccionGrafica.renderizarGrafoPequeno(grafo);
+        seccionGrafo.renderizarGrafoPequeno(grafo);
     }
 
     public void mostrarAvisoGrafoGrande(int totalVertices) {
-        seccionGrafica.mostrarMensajeGrafoGrande(totalVertices);
+        seccionGrafo.mostrarMensajeGrafoGrande(totalVertices);
     }
 
     public void resaltarRuta(ArrayList<Integer> secuenciaVertices) {
-        seccionGrafica.resaltarRuta(secuenciaVertices);
+        seccionGrafo.resaltarRuta(secuenciaVertices);
     }
 
-    public void actualizarGraficaBarras(ArrayList<Medicion> mediciones) {
-        graficaBarras.actualizarDatos(mediciones);
+    // Delegadores para el Controlador
+    public void alAgregarVertice(Runnable accion) { btnAgregarVertice.setOnAction(e -> accion.run()); }
+    public void alEliminarVertice(Runnable accion) { btnEliminarVertice.setOnAction(e -> accion.run()); }
+    public void alAgregarArista(Runnable accion) { btnAgregarArista.setOnAction(e -> accion.run()); }
+    public void alModificarPeso(Runnable accion) { btnModificarPeso.setOnAction(e -> accion.run()); }
+    public void alEliminarArista(Runnable accion) { btnEliminarArista.setOnAction(e -> accion.run()); }
+    public void alVerConexiones(Runnable accion) { btnVerConexiones.setOnAction(e -> accion.run()); }
+    public void alVerMatriz(Runnable accion) { btnVerMatriz.setOnAction(e -> accion.run()); }
+
+    // Getters de edición
+    public String getTextoOrigen() { return txtOrigen.getText().trim(); }
+    public String getTextoDestino() { return txtDestino.getText().trim(); }
+    public String getTextoPeso() { return txtPeso.getText().trim(); }
+
+    public void limpiarCampos() {
+        txtOrigen.clear();
+        txtDestino.clear();
+        txtPeso.clear();
     }
 
-    public void actualizarComparativaOrdenamientos(String nombre1, ArrayList<Medicion> serie1,
-                                                   String nombre2, ArrayList<Medicion> serie2) {
-        graficaBarras.actualizarComparativa(nombre1, serie1, nombre2, serie2);
+    public void alSeleccionarVertice(Consumer<Integer> accion) {
+        seccionGrafo.alSeleccionarVertice(accion);
     }
 
-    public void limpiarTodo() {
-        seccionGrafica.limpiar();
-        graficaBarras.limpiar();
+    public void setTextoOrigen(String texto) {
+        txtOrigen.setText(texto);
+    }
+
+    public void setTextoDestino(String texto) {
+        txtDestino.setText(texto);
+    }
+
+    public void setTextoPeso(String texto) {
+        txtPeso.setText(texto);
     }
 }

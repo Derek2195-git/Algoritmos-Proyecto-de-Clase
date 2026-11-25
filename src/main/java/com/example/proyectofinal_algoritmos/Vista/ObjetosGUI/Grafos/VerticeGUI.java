@@ -49,6 +49,10 @@ public class VerticeGUI {
         circulo.setFill(activo ? Color.SEAGREEN : Color.LIGHTBLUE);
     }
 
+    public void alHacerClic(Runnable accion) {
+        contenedor.setOnMouseClicked(e -> accion.run());
+    }
+
     public StackPane getContenedor() {
         return contenedor;
     }
