@@ -1,9 +1,9 @@
 package com.example.proyectofinal_algoritmos.Modelo.Archivos;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import com.example.proyectofinal_algoritmos.Modelo.Grafos.Arista;
+import com.example.proyectofinal_algoritmos.Modelo.Grafos.Grafo;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -262,5 +262,64 @@ public class GestorArchivo {
      */
     private char detectarSeparador(String encabezado) {
         return encabezado.indexOf(',') < 0 && encabezado.indexOf(';') >= 0 ? ';' : ',';
+    }
+
+    /**
+     * Guarda un grafo en formato CSV (los vértices sin conexiones no se guardan).
+     * @param grafo grafo a guardar
+     * @param mapa nombres de los vértices; si es null se escriben los ids
+     * @param archivo archivo destino
+     * @return número de conexiones escritas
+     * @throws IOException si no se puede escribir el archivo
+     */
+    public int guardarGrafo(Grafo grafo, MapaVertices mapa, File archivo) throws IOException {
+        ArrayList<Arista> aristas = grafo.obtenerAristas();
+        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo, StandardCharsets.UTF_8))) {
+            escritor.write(ENCABEZADO);
+            escritor.newLine();
+            for (int i = 0; i < aristas.size(); i++) {
+                Arista a = aristas.get(i);
+                String origen = mapa == null ? String.valueOf(a.getOrigen()) : mapa.getNombre(a.getOrigen());
+                String destino = mapa == null ? String.valueOf(a.getDestino()) : mapa.getNombre(a.getDestino());
+                escribirRegistro(escritor, origen, destino, a.getPeso());
+            }
+        }
+        return aristas.size();
+    }
+
+    private void escribirRegistro(BufferedWriter escritor, String origen, String destino, int peso)
+            throws IOException {
+        escritor.write(escaparCampo(origen) + "," + escaparCampo(destino) + "," + peso);
+        escritor.newLine();
+    }
+
+    /**
+     * Guarda una lista de conexiones en formato CSV.
+     * @param conexiones conexiones a guardar
+     * @param archivo archivo destino
+     * @throws IOException si no se puede escribir el archivo
+     */
+    public void guardarConexiones(ArrayList<ConexionCSV> conexiones, File archivo) throws IOException {
+        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo, StandardCharsets.UTF_8))) {
+            escritor.write(ENCABEZADO);
+            escritor.newLine();
+            for (int i = 0; i < conexiones.size(); i++) {
+                ConexionCSV c = conexiones.get(i);
+                escribirRegistro(escritor, c.getOrigen(), c.getDestino(), c.getPeso());
+            }
+        }
+    }
+
+    /**
+     * Encierra el texto entre comillas si contiene comas, comillas o punto y coma.
+     * @param texto texto del campo
+     * @return texto listo para escribirse en el CSV
+     */
+    public static String escaparCampo(String texto) {
+        if (texto == null) return "";
+        if (texto.indexOf(',') >= 0 || texto.indexOf('"') >= 0 || texto.indexOf(';') >= 0) {
+            return "\"" + texto.replace("\"", "\"\"") + "\"";
+        }
+        return texto;
     }
 }
