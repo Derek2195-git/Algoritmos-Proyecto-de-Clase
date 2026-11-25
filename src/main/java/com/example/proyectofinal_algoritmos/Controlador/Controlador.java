@@ -1,19 +1,8 @@
 package com.example.proyectofinal_algoritmos.Controlador;
 
-import com.example.proyectofinal_algoritmos.Modelo.Analisis.ComplejidadTeorica;
-import com.example.proyectofinal_algoritmos.Modelo.Analisis.Medicion;
-import com.example.proyectofinal_algoritmos.Modelo.Grafos.Grafo;
-import com.example.proyectofinal_algoritmos.Vista.Secciones.SeccionResultados;
-import com.example.proyectofinal_algoritmos.Vista.Secciones.SeccionSuperior;
-import com.example.proyectofinal_algoritmos.Vista.Secciones.SeccionTabla;
-import com.example.proyectofinal_algoritmos.Vista.VentanaAnalisis;
-import com.example.proyectofinal_algoritmos.Vista.VentanaGrafo;
-import com.example.proyectofinal_algoritmos.Vista.VentanaPrincipal;
+import com.example.proyectofinal_algoritmos.Vista.Ventanas.VentanaPrincipal;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.util.ArrayList;
 
 public class Controlador {
     private VentanaPrincipal ventana;
