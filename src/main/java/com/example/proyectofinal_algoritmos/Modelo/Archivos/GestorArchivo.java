@@ -12,13 +12,12 @@ import java.util.HashMap;
  * La clase lee, valida y escribe archivos CSV con el formato origen,destino,peso.
  */
 public class GestorArchivo {
-
     public static final String COL_ORIGEN = "origen";
     public static final String COL_DESTINO = "destino";
     public static final String COL_PESO = "peso";
     public static final String ENCABEZADO = COL_ORIGEN + "," + COL_DESTINO + "," + COL_PESO;
 
-    private static final char BOM = '﻿';
+    private static final char BOM = '\uFEFF';
 
     /**
      * Lee y valida un CSV sin construir el grafo.
