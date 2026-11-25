@@ -16,146 +16,177 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Controlador {
-    private Stage stage;
-    private VentanaPrincipal vista;
-    private Grafo grafoPrueba;
+    private VentanaPrincipal ventana;
 
     public Controlador(Stage stage) {
-        this.stage = stage;
-        this.vista = new VentanaPrincipal(stage);
+        this.ventana = new VentanaPrincipal(stage);
 
-        inicializarGrafoDePrueba();
         conectarEventosVista();
 
-        Scene escena = new Scene(vista.getContenedor(), 1100, 720);
+        Scene escena = new Scene(ventana.getContenedor(), 1100, 720);
         stage.setTitle("Sistema de Gestión y Análisis de Rutas mediante Grafos");
         stage.setScene(escena);
         stage.show();
     }
 
-    private void inicializarGrafoDePrueba() {
-        grafoPrueba = new Grafo("Grafo de Prueba", false);
-        grafoPrueba.agregarVertice(1);
-        grafoPrueba.agregarVertice(2);
-        grafoPrueba.agregarVertice(3);
-        grafoPrueba.agregarVertice(4);
-
-        grafoPrueba.agregarArista(1, 2, 100);
-        grafoPrueba.agregarArista(2, 3, 80);
-        grafoPrueba.agregarArista(3, 4, 120);
-        grafoPrueba.agregarArista(1, 4, 150);
-
-        vista.getSeccionTabla().getTabla().mostrarConexiones(grafoPrueba);
-    }
 
     private void conectarEventosVista() {
-        SeccionSuperior superior = vista.getSeccionSuperior();
-        SeccionTabla tabla = vista.getSeccionTabla();
-        SeccionResultados resultados = vista.getSeccionResultados();
-        VentanaGrafo ventanaGrafo = vista.getVentanaGrafo();
-        VentanaAnalisis ventanaAnalisis = vista.getVentanaAnalisis();
 
-        // --- Ventana Principal: Archivos y Ventanas Secundarias ---
-        superior.alCargarCSV(() -> {
-            File archivo = vista.seleccionarArchivoAbrir();
-            if (archivo != null) {
-                resultados.mostrarTexto("Archivo seleccionado para abrir: " + archivo.getAbsolutePath());
-            }
-        });
+        // Acciones de los botones de la sección de arriba
+        ventana.getSeccionSuperior().alCargarCSV(this::manejarCargaCSV);
+        ventana.getSeccionSuperior().alGuardarCSV(this::manejarGuardarCSV);
+        ventana.getSeccionSuperior().alGenerarPrueba(this::manejarGeneracionGrafo);
+        ventana.getSeccionSuperior().alCambiarDirigido(this::manejarCambioDirigido);
+        ventana.getSeccionSuperior().alAbrirVentanaGrafo(this::manejarAbrirVentanaGrafo);
+        ventana.getSeccionSuperior().alEjecutarBusqueda(this::manejarEjecucionBusqueda);
+        ventana.getSeccionSuperior().alEjecutarOrdenamiento(this::manejarEjecucionOrdenamiento);
+        ventana.getSeccionSuperior().alEjecutarAnalisisEmpirico(this::manejarAnalisisEmpirico);
 
-        superior.alGuardarCSV(() -> {
-            File archivo = vista.seleccionarArchivoGuardar();
-            if (archivo != null) {
-                resultados.mostrarTexto("Ruta seleccionada para guardar: " + archivo.getAbsolutePath());
-            }
-        });
+        // Acciones de los botones de la parte de abajo
+        ventana.getSeccionResultados().alVerComplejidad(this::manejarVerComplejidad);
+        ventana.getSeccionResultados().alLimpiar(this::manejarLimpiarResultados);
 
-        superior.alGenerarPrueba(() -> {
-            String texto = superior.getTextoCantidadVertices();
-            int n = texto.isEmpty() ? 20 : Integer.parseInt(texto);
-            resultados.mostrarTexto("Solicitud para generar grafo de " + n + " vértices (pendiente conectar GeneradorGrafo).");
-        });
+        // Acciones de los botones de la ventana del grafo
+        ventana.getVentanaGrafo().alVerConexiones(this::manejarVerConexiones);
+        ventana.getVentanaGrafo().alVerMatriz(this::manejarVerMatriz);
+        ventana.getVentanaGrafo().alAgregarVertice(this::manejarAgregarVertice);
+        ventana.getVentanaGrafo().alEliminarVertice(this::manejarEliminarVertice);
+        ventana.getVentanaGrafo().alAgregarArista(this::manejarAgregarArista);
+        ventana.getVentanaGrafo().alModificarPeso(this::manejarModificarPeso);
+        ventana.getVentanaGrafo().alEliminarArista(this::manejarEliminarArista);
+        ventana.getVentanaGrafo().alSeleccionarVertice(this::manejarSeleccionVertice);
+    }
 
-        superior.alAbrirVentanaGrafo(() -> {
-            if (grafoPrueba.cantidadVertices() <= 50) {
-                ventanaGrafo.mostrarGrafoPequeno(grafoPrueba);
-            } else {
-                ventanaGrafo.mostrarAvisoGrafoGrande(grafoPrueba.cantidadVertices());
-            }
-            ventanaGrafo.mostrar();
-        });
+    // Seccion de arriba
 
-        superior.alEjecutarBusqueda(() -> {
-            ArrayList<Integer> rutaEjemplo = new ArrayList<>();
-            rutaEjemplo.add(1);
-            rutaEjemplo.add(2);
-            rutaEjemplo.add(3);
-            ventanaGrafo.resaltarRuta(rutaEjemplo);
-            resultados.mostrarTexto("Búsqueda seleccionada: " + superior.getBusquedaSeleccionada()
-                    + "\nRecorrido / ruta de prueba resaltada: 1 -> 2 -> 3");
-        });
+    /**
+     * Maneja la carga del archivo csv, por medio de un objeto de tipo FileChooser
+     */
+    private void manejarCargaCSV() {
 
-        superior.alEjecutarOrdenamiento(() -> {
-            resultados.mostrarTexto("Ordenamiento seleccionado: " + superior.getOrdenamientoSeleccionado()
-                    + " (" + superior.getCriterioOrdenamiento() + ")");
-        });
+    }
 
-        superior.alEjecutarAnalisisEmpirico(() -> {
-            ArrayList<Medicion> quickSort = new ArrayList<>();
-            quickSort.add(new Medicion("QuickSort", 20, 150_000));
-            quickSort.add(new Medicion("QuickSort", 100, 620_000));
-            quickSort.add(new Medicion("QuickSort", 500, 2_800_000));
+    /**
+     * Maneja el guardado del archivo csv, por medio de un objeto de tipo FileChooser
+     */
+    private void manejarGuardarCSV() {
 
-            ArrayList<Medicion> shellSort = new ArrayList<>();
-            shellSort.add(new Medicion("Shell Sort", 20, 180_000));
-            shellSort.add(new Medicion("Shell Sort", 100, 740_000));
-            shellSort.add(new Medicion("Shell Sort", 500, 3_400_000));
+    }
 
-            ventanaAnalisis.actualizarComparativa("QuickSort", quickSort, "Shell Sort", shellSort);
-            ventanaAnalisis.mostrar();
-        });
+    /**
+     * Maneja la generación de un grafo, en base a la cantidad de vertices ingresada
+     */
+    private void manejarGeneracionGrafo() {
 
-        // --- Sección Resultados ---
-        resultados.alVerComplejidad(() -> resultados.mostrarTexto(ComplejidadTeorica.generarTabla()));
-        resultados.alLimpiar(resultados::limpiar);
+    }
 
-        // --- Ventana Grafo: Estructura y Edición ---
-        ventanaGrafo.alVerConexiones(() -> {
-            tabla.setTitulo("Estructura del Grafo (Lista de Conexiones)");
-            tabla.getTabla().mostrarConexiones(grafoPrueba);
-        });
+    /**
+     * Maneja el cambio de configuración entre el grafo dirigido y uno no dirigido
+     */
+    private void manejarCambioDirigido() {
 
+    }
 
+    /**
+     * Maneja la apertura de la ventana secundaria para editar y visualizar el grafo
+     */
+    private void manejarAbrirVentanaGrafo() {
 
-        ventanaGrafo.alVerMatriz(() -> {
-            tabla.setTitulo("Matriz de Adyacencia");
-            tabla.getTabla().mostrarMatrizAdyacencia(grafoPrueba);
-        });
+    }
 
-        ventanaGrafo.alAgregarVertice(() -> resultados.mostrarTexto("Botón '+ Vértice' presionado (Origen: " + ventanaGrafo.getTextoOrigen() + ")"));
-        ventanaGrafo.alEliminarVertice(() -> resultados.mostrarTexto("Botón '- Vértice' presionado (Origen: " + ventanaGrafo.getTextoOrigen() + ")"));
-        ventanaGrafo.alAgregarArista(() -> resultados.mostrarTexto("Botón '+ Arista' presionado (" + ventanaGrafo.getTextoOrigen() + " -> " + ventanaGrafo.getTextoDestino() + ", peso " + ventanaGrafo.getTextoPeso() + ")"));
-        ventanaGrafo.alModificarPeso(() -> resultados.mostrarTexto("Botón 'Modificar Peso' presionado"));
-        ventanaGrafo.alEliminarArista(() -> resultados.mostrarTexto("Botón '- Arista' presionado"));
+    /**
+     * Maneja la ejecución del algoritmo de búsqueda o ruta óptima seleccionado (BFS, DFS o Dijkstra)
+     */
+    private void manejarEjecucionBusqueda() {
 
-        ventanaGrafo.alSeleccionarVertice(id -> {
-            String idTexto = String.valueOf(id);
-            if (ventanaGrafo.getTextoOrigen().isEmpty()) {
-                ventanaGrafo.setTextoOrigen(idTexto);
-            } else if (ventanaGrafo.getTextoDestino().isEmpty()) {
-                ventanaGrafo.setTextoDestino(idTexto);
-                // Si ya existe arista entre ambos en el modelo, precargar su peso:
-                int origen = Integer.parseInt(ventanaGrafo.getTextoOrigen());
-                int peso = grafoPrueba.obtenerPeso(origen, id);
-                if (peso != -1) {
-                    ventanaGrafo.setTextoPeso(String.valueOf(peso));
-                }
-            } else {
-                // Si ambos estaban llenos, reinicia el ciclo poniendo el nuevo como origen
-                ventanaGrafo.setTextoOrigen(idTexto);
-                ventanaGrafo.setTextoDestino("");
-                ventanaGrafo.setTextoPeso("");
-            }
-        });
+    }
+
+    /**
+     * Maneja el ordenamiento de las conexiones del grafo mediante QuickSort o Shell Sort
+     */
+    private void manejarEjecucionOrdenamiento() {
+
+    }
+
+    /**
+     * Maneja la medición empírica de tiempos y muestra los resultados en la ventana de gráfica
+     */
+    private void manejarAnalisisEmpirico() {
+
+    }
+
+    // Seccion de resultados
+
+    /**
+     * Maneja la visualización de la tabla de complejidad teórica en el área de resultados
+     */
+    private void manejarVerComplejidad() {
+
+    }
+
+    /**
+     * Maneja la limpieza del texto mostrado en el área de resultados
+     */
+    private void manejarLimpiarResultados() {
+
+    }
+
+    // Seccion de la ventana del grafo
+
+    /**
+     * Maneja el cambio de vista en la tabla para mostrar la lista de conexiones del grafo
+     */
+    private void manejarVerConexiones() {
+
+    }
+
+    /**
+     * Maneja el cambio de vista en la tabla para mostrar la matriz de adyacencia del grafo
+     */
+    private void manejarVerMatriz() {
+
+    }
+
+    /**
+     * Maneja la inserción manual de un nuevo vértice en el grafo activo
+     */
+    private void manejarAgregarVertice() {
+
+    }
+
+    /**
+     * Maneja la eliminación manual de un vértice y sus conexiones en el grafo activo
+     */
+    private void manejarEliminarVertice() {
+
+    }
+
+    /**
+     * Maneja la creación manual de una arista entre dos vértices con un peso asignado
+     */
+    private void manejarAgregarArista() {
+
+    }
+
+    /**
+     * Maneja la modificación del peso de una arista existente en el grafo activo
+     */
+    private void manejarModificarPeso() {
+
+    }
+
+    /**
+     * Maneja la eliminación manual de una arista entre dos vértices del grafo activo
+     */
+    private void manejarEliminarArista() {
+
+    }
+
+    /**
+     * Maneja la selección de un vértice al hacer clic sobre él para llenar los campos de edición
+     * @param valor identificador entero del vértice seleccionado
+     */
+    private void manejarSeleccionVertice(int valor) {
+
     }
 }

@@ -15,6 +15,10 @@ public class GraficaBarras {
     private NumberAxis ejeY;
     private VBox contenedor;
 
+    /**
+     * Constructor de la gráfica de barras
+     * @param titulo
+     */
     public GraficaBarras(String titulo) {
         ejeX = new CategoryAxis();
         ejeY = new NumberAxis();

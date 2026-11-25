@@ -3,6 +3,11 @@ package com.example.proyectofinal_algoritmos.Modelo.Grafos;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Clase que modela a un conjunto de varios grafos
+ * @version 24/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class ConjuntoGrafos {
     // Logica principal
     private HashMap<String, Grafo> grafos;

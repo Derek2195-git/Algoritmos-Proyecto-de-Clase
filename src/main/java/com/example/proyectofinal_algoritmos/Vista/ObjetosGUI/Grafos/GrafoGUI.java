@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+/**
+ * Clase que modela a un grafo en la pantalla
+ * @version 23/11/2026
+ * @author Derek Ramón Garzón Vizcarra
+ */
 public class GrafoGUI {
     private Pane contenedor;
     private double ancho;
@@ -14,6 +19,11 @@ public class GrafoGUI {
     private HashMap<String, AristaGUI> aristas;
     private Consumer<Integer> accionClicVertice;
 
+    /**
+     * Constructor de la representación gráfica del Grafo
+     * @param ancho Ancho dado al grafo
+     * @param alto Alto dado al grafo
+     */
     public GrafoGUI(double ancho, double alto) {
         this.ancho = ancho;
         this.alto = alto;
@@ -24,10 +34,20 @@ public class GrafoGUI {
         aristas = new HashMap<>();
     }
 
+    /**
+     * Getter del contenedor donde se obtiene el grafo
+     * @return Objeto donde se contiene al grafo, teniendo en cuenta  lo que posea dentro
+     */
     public Pane getContenedor() {
         return contenedor;
     }
 
+    /**
+     * Metodo que dibuja al grafo
+     * @param ids ids de cada vertice
+     * @param conexiones Matriz donde se indica la conexión de cada vertice
+     * @param dirigido Boolean que indica si el grafo debe ser dirigido o no
+     */
     public void dibujar(ArrayList<Integer> ids, int[][] conexiones, boolean dirigido) {
         limpiar();
         int n = ids.size();
@@ -40,7 +60,7 @@ public class GrafoGUI {
         // Con muchos vértices, cada círculo se hace más pequeño para no encimarse
         double radioVertice = Math.min(20, Math.PI * radioCirculo / n * 0.8);
 
-        // 1. Crear los vértices en círculo (todavía sin agregarlos al dibujo)
+        // Creamos cada vertice sin añadirlos
         for (int i = 0; i < n; i++) {
             double angulo = 2 * Math.PI * i / n - Math.PI / 2;
             double x = centroX + radioCirculo * Math.cos(angulo);
@@ -57,7 +77,7 @@ public class GrafoGUI {
             vertices.put(idActual, vGui);
         }
 
-        // 2. Aristas primero, para que los vértices queden encima de las líneas
+        // Luego se crean y dibujan las aristas
         for (int i = 0; i < conexiones.length; i++) {
             int origen = conexiones[i][0];
             int destino = conexiones[i][1];
@@ -72,29 +92,46 @@ public class GrafoGUI {
             contenedor.getChildren().add(arista.getContenedor());
         }
 
-        // 3. Vértices al final
+        // Se añaden los vertices para encimarlos a las aristas
         for (int i = 0; i < n; i++) {
             contenedor.getChildren().add(vertices.get(ids.get(i)).getContenedor());
         }
     }
 
+    /**
+     * Metodo que limpia el grafo, con los vertices y aristas que tuviera adentro
+     */
     public void limpiar() {
         contenedor.getChildren().clear();
         vertices.clear();
         aristas.clear();
     }
 
+    /**
+     * Metodo que resalta un vertice
+     * @param id Id del vertice
+     * @param activo Boolean que indica si el vertice debe resaltarse
+     */
     public void resaltarVertice(int id, boolean activo) {
         VerticeGUI vertice = vertices.get(id);
         if (vertice != null) vertice.resaltar(activo);
     }
 
+    /**
+     * Metodo que resalta un arista
+     * @param origen Vertice de origen del arista
+     * @param destino Vertice de destino del arista
+     * @param activo Boolean que indica si el arista debe resaltarse
+     */
     public void resaltarArista(int origen, int destino, boolean activo) {
         AristaGUI arista = aristas.get(origen + "-" + destino);
         if (arista != null) arista.resaltar(activo);
     }
 
-    // Resalta los vértices de la ruta y las aristas entre vértices consecutivos
+    /**
+     * Metodo que resalta una ruta dada
+     * @param ruta Ruta que posee los ids de los vertices a resaltar
+     */
     public void resaltarRuta(ArrayList<Integer> ruta) {
         limpiarResaltado();
         for (int i = 0; i < ruta.size(); i++) {
@@ -103,6 +140,9 @@ public class GrafoGUI {
         }
     }
 
+    /**
+     * Metodo que limpia los vertices y aristas resaltados
+     */
     public void limpiarResaltado() {
         for (VerticeGUI vertice : vertices.values()) {
             vertice.resaltar(false);
@@ -112,6 +152,10 @@ public class GrafoGUI {
         }
     }
 
+    /**
+     * Metodo que hace que el vertice realice una acción al darse click
+     * @param accion Accion a realizar, esta debe tener obligatoriamente un parametro de tipo entero en el controlador
+     */
     public void alHacerClicVertice(Consumer<Integer> accion) {
         this.accionClicVertice = accion;
     }
