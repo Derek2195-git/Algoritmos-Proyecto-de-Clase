@@ -322,4 +322,15 @@ public class GestorArchivo {
         }
         return texto;
     }
+
+    /**
+     * Obtiene el nombre del archivo sin su extensión.
+     * @param archivo archivo
+     * @return nombre sin extensión
+     */
+    public static String obtenerNombreSinExtension(File archivo) {
+        String nombre = archivo.getName();
+        int punto = nombre.lastIndexOf('.');
+        return punto > 0 ? nombre.substring(0, punto) : nombre;
+    }
 }
