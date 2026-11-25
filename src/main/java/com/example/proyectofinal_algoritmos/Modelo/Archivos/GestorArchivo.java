@@ -18,6 +18,15 @@ public class GestorArchivo {
     public static final String ENCABEZADO = COL_ORIGEN + "," + COL_DESTINO + "," + COL_PESO;
 
     private static final char BOM = '\uFEFF';
+    private final GeneradorGrafo generador;
+
+    public GestorArchivo() {
+        generador = new GeneradorGrafo();
+    }
+
+    public GeneradorGrafo getGenerador() {
+        return generador;
+    }
 
     /**
      * Lee y valida un CSV sin construir el grafo.
