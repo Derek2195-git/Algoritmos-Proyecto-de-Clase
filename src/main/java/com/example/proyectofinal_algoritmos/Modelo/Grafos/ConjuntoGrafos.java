@@ -44,7 +44,7 @@ public class ConjuntoGrafos {
         Grafo grafo = grafos.get(nombre);
         if (grafo == null) return false;
         grafoActivo = grafo;
-        return false;
+        return true;
     }
 
     public boolean renombrarGrafos(String nombreActual, String nombreNuevo) {

@@ -84,9 +84,9 @@ public class Grafo {
         if (peso < 0) return false;
         // La arista no existe
         if (existeArista(origen, destino)) return false;
-        vertices.get(destino).agregarArista(new Arista(destino, origen, peso));
+        vertices.get(origen).agregarArista(new Arista(peso, origen, destino));
         if (!dirigido) {
-            vertices.get(destino).agregarArista(new Arista(destino, origen, peso));
+            vertices.get(destino).agregarArista(new Arista(peso, destino, origen));
         }
         return true;
     }
@@ -112,7 +112,8 @@ public class Grafo {
     }
 
     public int obtenerPeso(int origen, int destino) {
-        return buscarAristaExistente(origen, destino).getPeso();
+        Arista aristaABuscar = buscarAristaExistente(origen, destino);
+        return aristaABuscar != null ? aristaABuscar.getPeso() : -1;
     }
 
     public ArrayList<Arista> obtenerAristas() {
