@@ -61,7 +61,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.example.proyectofinal_algoritmos/com.example.proyectofinal_algoritmos.HelloApplication
+                                com.example.proyectofinal_algoritmos/com.example.proyectofinal_algoritmos.Launcher
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

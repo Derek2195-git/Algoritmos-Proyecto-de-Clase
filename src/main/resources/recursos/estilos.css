@@ -1,0 +1,35 @@
+/* Estilos de la aplicación (clases definidas en las secciones de la vista) */
+
+.ventana-principal {
+    -fx-background-color: #f4f6f9;
+}
+
+.seccion-superior {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #d9dee5 transparent;
+}
+
+.titulo-seccion {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f3a5f;
+}
+
+.button {
+    -fx-cursor: hand;
+}
+
+.area-resultados {
+    -fx-font-family: "Menlo", "Consolas", "Monospaced";
+    -fx-font-size: 12px;
+}
+
+.contenedor-grafo {
+    -fx-background-color: #ffffff;
+}
+
+.mensaje-aviso {
+    -fx-text-fill: #8a5a00;
+    -fx-font-size: 13px;
+    -fx-text-alignment: center;
+}
