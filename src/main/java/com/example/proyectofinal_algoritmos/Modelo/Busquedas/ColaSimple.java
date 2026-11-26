@@ -31,4 +31,8 @@ public class ColaSimple<T> {
         }
         return dato;
     }
+
+    public boolean estaVacia() {
+        return inicio == -1;
+    }
 }
