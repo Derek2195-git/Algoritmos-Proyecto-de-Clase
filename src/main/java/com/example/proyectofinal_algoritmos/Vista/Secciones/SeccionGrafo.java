@@ -82,7 +82,8 @@ public class SeccionGrafo {
         lblEstadoGrafo.setText("Grafo de " + totalVertices + " vértices (límite visual: 50)");
 
         Label aviso = new Label("El grafo supera los 50 vértices permitidos para dibujarse en pantalla.\n"
-                + "Consulta sus conexiones o matriz de adyacencia en la ventana principal.");
+                + "Consulta sus conexiones o matriz de adyacencia en la ventana principal. \n" +
+                "Tambien puede crear otro grafo con menos de 50 vertices.");
         aviso.getStyleClass().add("mensaje-aviso");
         contenedorGrafo.getChildren().add(aviso);
     }

@@ -79,7 +79,7 @@ public class SeccionSuperior {
         txtInicioBusqueda.setPrefWidth(75);
 
         txtFinBusqueda = new TextField();
-        txtFinBusqueda.setPromptText("Fin (Dijkstra)");
+        txtFinBusqueda.setPromptText("Fin");
         txtFinBusqueda.setPrefWidth(95);
 
         btnEjecutarBusqueda = new Button("Ejecutar Búsqueda");

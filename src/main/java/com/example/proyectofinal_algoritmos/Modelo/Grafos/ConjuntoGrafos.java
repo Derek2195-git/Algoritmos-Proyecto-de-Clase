@@ -9,7 +9,6 @@ import java.util.HashMap;
  * @author Derek Ramón Garzón Vizcarra
  */
 public class ConjuntoGrafos {
-    // Logica principal
     private HashMap<String, Grafo> grafos;
     private Grafo grafoActivo;
 
