@@ -1,10 +1,12 @@
 package com.example.proyectofinal_algoritmos.Vista.ObjetosGUI.Grafos;
 
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Text;
 
 
 /**
@@ -16,7 +18,7 @@ public class AristaGUI {
 
     private Line linea;
     private Polygon flecha;
-    private Label textoPeso;
+    private Text textoPeso;
     private Group contenedor;
 
     /**
@@ -39,19 +41,19 @@ public class AristaGUI {
         double finY = destino.getCentroY() - uy * destino.getRadio();
 
         linea = new Line(inicioX, inicioY, finX, finY);
-        linea.setStroke(Color.GRAY);
 
         double px = -uy;
         double py = ux;
 
-
-        textoPeso = new Label(String.valueOf(peso));
+        textoPeso = new Text(String.valueOf(peso));
+        textoPeso.setTextOrigin(VPos.CENTER);
         double centroTextoX = (inicioX + finX) / 2 + px * 12;
         double centroTextoY = (inicioY + finY) / 2 + py * 12;
-        textoPeso.layoutXProperty().bind(textoPeso.widthProperty().divide(-2).add(centroTextoX));
-        textoPeso.layoutYProperty().bind(textoPeso.heightProperty().divide(-2).add(centroTextoY));
-        textoPeso.setStyle("-fx-background-color: transparent; -fx-padding: 0 2 0 2;");
+        textoPeso.setX(centroTextoX - textoPeso.getLayoutBounds().getWidth() / 2);
+        textoPeso.setY(centroTextoY);
 
+        linea.getStyleClass().add("arista-linea");
+        textoPeso.getStyleClass().add("arista-peso");
         contenedor = new Group();
 
         contenedor.getChildren().add(linea);
@@ -62,7 +64,7 @@ public class AristaGUI {
                     finX, finY,
                     finX - ux * largo + px * largo / 2, finY - uy * largo + py * largo / 2,
                     finX - ux * largo - px * largo / 2, finY - uy * largo - py * largo / 2);
-            flecha.setFill(Color.GRAY);
+            flecha.getStyleClass().add("arista-flecha");
             contenedor.getChildren().add(flecha);
         }
 
@@ -82,11 +84,9 @@ public class AristaGUI {
      * @param activo Boolean que indica si ya se ha visitado el nodo
      */
     public void resaltar(boolean activo) {
-        Color color = activo ? Color.SEAGREEN : Color.GRAY;
-        linea.setStroke(color);
-        linea.setStrokeWidth(activo ? 3 : 1);
-        if (flecha != null) {
-            flecha.setFill(color);
+        contenedor.getStyleClass().remove("arista-resaltada");
+        if (activo) {
+            contenedor.getStyleClass().add("arista-resaltada");
         }
     }
 

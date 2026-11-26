@@ -83,11 +83,12 @@ public class Controlador {
         ventana.getSeccionSuperior().alAbrirVentanaGrafo(this::manejarAbrirVentanaGrafo);
         ventana.getSeccionSuperior().alEjecutarBusqueda(this::manejarEjecucionBusqueda);
         ventana.getSeccionSuperior().alEjecutarOrdenamiento(this::manejarEjecucionOrdenamiento);
-        ventana.getSeccionSuperior().alEjecutarAnalisisEmpirico(this::manejarAnalisisEmpirico);
+
 
         // Acciones de los botones de la parte de abajo en la ventana principal
         ventana.getSeccionResultados().alVerComplejidad(this::manejarVerComplejidad);
         ventana.getSeccionResultados().alLimpiar(this::manejarLimpiarResultados);
+        ventana.getSeccionResultados().alEjecutarAnalisisEmpirico(this::manejarAnalisisEmpirico);
 
         // Acciones de los botones de la ventana del grafo
         ventana.getVentanaGrafo().alVerConexiones(this::manejarVerConexiones);
@@ -358,7 +359,11 @@ public class Controlador {
             return;
         }
         boolean dirigido = ventana.getSeccionSuperior().esDirigido();
-        File carpeta = new File(System.getProperty("user.dir"), "analisis_empirico");
+        File carpeta = new File(System.getProperty("user.dir"), "src/main/resources/recursos/analisis_empirico");
+        if (!carpeta.exists() && !carpeta.mkdirs()) {
+            mostrarError("No se pudo crear la carpeta: " + carpeta.getAbsolutePath());
+            return;
+        }
         AnalisisEmpirico analisis = new AnalisisEmpirico(gestor);
 
         trabajando = true;

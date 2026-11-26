@@ -208,11 +208,12 @@ public class MedidorTiempos {
      */
     public String generarTabla() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%-22s %10s %14s %6s  %s%n", "Algoritmo", "Tamaño", "Tiempo (ms)", "Reps", "Datos"));
-        sb.append("-".repeat(80)).append('\n');
+        sb.append(String.format(Locale.US,"%-22s %10s %13s %6s  %s%n", "Algoritmo", "Tamaño", "Tiempo (ms)", "Reps",
+                "Datos (V = Vertices, E = Aristas)"));
+        sb.append("_".repeat(82)).append('\n');
         for (int i = 0; i < mediciones.size(); i++) {
             Medicion m = mediciones.get(i);
-            sb.append(String.format(Locale.US, "%-22s %10d %14.4f %6d  %s%n",
+            sb.append(String.format(Locale.US, "%-22s %10d %13.4f %6d  %s%n",
                     m.getAlgoritmo(), m.getTamanio(), m.getTiempoMilisegundos(),
                     m.getRepeticiones(), m.getDatos()));
         }

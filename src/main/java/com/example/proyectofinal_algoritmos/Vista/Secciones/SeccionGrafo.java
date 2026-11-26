@@ -47,6 +47,7 @@ public class SeccionGrafo {
         VBox.setVgrow(scrollGrafo, Priority.ALWAYS);
 
         grafoGUI = new GrafoGUI(860, 320);
+        VBox.setVgrow(grafoGUI.getContenedor(), Priority.ALWAYS);
 
         contenedor.getChildren().addAll(lblEstadoGrafo, scrollGrafo);
     }

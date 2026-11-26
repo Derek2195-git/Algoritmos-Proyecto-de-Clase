@@ -19,6 +19,7 @@ public class SeccionResultados {
     private Label lblTitulo;
     private TextArea areaResultados;
     private Button btnVerComplejidad;
+    private Button btnAnalisisEmpirico;
     private Button btnLimpiar;
 
     /**
@@ -35,7 +36,9 @@ public class SeccionResultados {
         btnVerComplejidad = new Button("Ver Complejidad Teórica");
         btnLimpiar = new Button("Limpiar");
 
-        HBox barraSuperior = new HBox(10, lblTitulo, btnVerComplejidad, btnLimpiar);
+        btnAnalisisEmpirico = new Button("Análisis Empírico");
+
+        HBox barraSuperior = new HBox(10, lblTitulo, btnVerComplejidad, btnLimpiar, btnAnalisisEmpirico);
         barraSuperior.setAlignment(Pos.CENTER_LEFT);
 
         areaResultados = new TextArea();
@@ -90,6 +93,13 @@ public class SeccionResultados {
     public void alVerComplejidad(Runnable accion) {
         btnVerComplejidad.setOnAction(e -> accion.run());
     }
+
+    /**
+     * Metodo que asigna la acción a realizar al presionar el botón de análisis empírico
+     * @param accion Acción a realizar
+     */
+    public void alEjecutarAnalisisEmpirico(Runnable accion) { btnAnalisisEmpirico.setOnAction(e -> accion.run()); }
+
 
     /**
      * Metodo que asigna la acción a realizar al presionar el botón de limpiar

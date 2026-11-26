@@ -52,18 +52,30 @@ public class VentanaPrincipal {
     public File seleccionarArchivoAbrir() {
         FileChooser selector = new FileChooser();
         selector.setTitle("Seleccionar archivo CSV de grafo");
+
+        File directorioInicial = new File(System.getProperty("user.dir"), "src/main/resources/recursos");
+        if (directorioInicial != null && directorioInicial.exists() && directorioInicial.isDirectory()) {
+            selector.setInitialDirectory(directorioInicial);
+        }
+
         selector.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv")
         );
         return selector.showOpenDialog(stagePrincipal);
     }
-
     /**
      * Metodo que despliega un cuadro de diálogo para elegir la ruta donde guardar un archivo CSV
      * @return Archivo CSV de destino seleccionado o null si el usuario cancela la operación
      */
     public File seleccionarArchivoGuardar() {
         FileChooser selector = new FileChooser();
+
+        File directorioInicial = new File(System.getProperty("user.dir"), "src/main/resources/recursos");
+        if (directorioInicial != null && directorioInicial.exists() && directorioInicial.isDirectory()) {
+            selector.setInitialDirectory(directorioInicial);
+        }
+
+
         selector.setTitle("Guardar grafo como CSV");
         selector.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv")

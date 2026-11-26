@@ -13,58 +13,88 @@ import java.util.function.Consumer;
  */
 public class GrafoGUI {
     private Pane contenedor;
-    private double ancho;
-    private double alto;
     private HashMap<Integer, VerticeGUI> vertices;
     private HashMap<String, AristaGUI> aristas;
     private Consumer<Integer> accionClicVertice;
 
+    // Datos del último grafo recibido, para poder volver a acomodarlo
+    private ArrayList<Integer> ids;
+    private int[][] conexiones;
+    private boolean dirigido;
+    private ArrayList<Integer> rutaActual;
+
     /**
      * Constructor de la representación gráfica del Grafo
-     * @param ancho Ancho dado al grafo
-     * @param alto Alto dado al grafo
+     * @param ancho Ancho preferido inicial del área de dibujo
+     * @param alto Alto preferido inicial del área de dibujo
      */
     public GrafoGUI(double ancho, double alto) {
-        this.ancho = ancho;
-        this.alto = alto;
-
         contenedor = new Pane();
         contenedor.setPrefSize(ancho, alto);
+        contenedor.setMinSize(300, 260);
         vertices = new HashMap<>();
         aristas = new HashMap<>();
+        ids = new ArrayList<>();
+        conexiones = new int[0][3];
+        rutaActual = new ArrayList<>();
+
+        // Si cambia el tamaño del área, se vuelve a acomodar para seguir centrado
+        contenedor.widthProperty().addListener((obs, anterior, nuevo) -> redibujar());
+        contenedor.heightProperty().addListener((obs, anterior, nuevo) -> redibujar());
     }
 
     /**
      * Getter del contenedor donde se obtiene el grafo
-     * @return Objeto donde se contiene al grafo, teniendo en cuenta  lo que posea dentro
+     * @return Objeto donde se contiene al grafo, teniendo en cuenta lo que posea dentro
      */
     public Pane getContenedor() {
         return contenedor;
     }
 
     /**
-     * Metodo que dibuja al grafo
+     * Metodo que dibuja un grafo nuevo, descartando cualquier resaltado anterior
      * @param ids ids de cada vertice
      * @param conexiones Matriz donde se indica la conexión de cada vertice
      * @param dirigido Boolean que indica si el grafo debe ser dirigido o no
      */
     public void dibujar(ArrayList<Integer> ids, int[][] conexiones, boolean dirigido) {
-        limpiar();
+        this.ids = new ArrayList<>(ids);
+        this.conexiones = conexiones;
+        this.dirigido = dirigido;
+        this.rutaActual = new ArrayList<>();
+        redibujar();
+    }
+
+    // Vuelve a crear el dibujo, centrado en el tamaño actual del contenedor
+    private void redibujar() {
+        contenedor.getChildren().clear();
+        vertices.clear();
+        aristas.clear();
+
         int n = ids.size();
         if (n == 0) return;
+
+        // Antes de que JavaFX acomode el contenedor su tamaño es 0, así que se usa el preferido
+        double ancho = contenedor.getWidth() > 0 ? contenedor.getWidth() : contenedor.getPrefWidth();
+        double alto = contenedor.getHeight() > 0 ? contenedor.getHeight() : contenedor.getPrefHeight();
 
         double centroX = ancho / 2;
         double centroY = alto / 2;
         double margen = 40;
-        double radioCirculo = Math.min(ancho, alto) / 2 - margen;
+        double radioCirculo = Math.max(Math.min(ancho, alto) / 2 - margen, 20);
         // Con muchos vértices, cada círculo se hace más pequeño para no encimarse
         double radioVertice = Math.min(20, Math.PI * radioCirculo / n * 0.8);
 
         // Creamos cada vertice sin añadirlos
         for (int i = 0; i < n; i++) {
-            double angulo = 2 * Math.PI * i / n - Math.PI / 2;
-            double x = centroX + radioCirculo * Math.cos(angulo);
-            double y = centroY + radioCirculo * Math.sin(angulo);
+            double x = centroX;
+            double y = centroY;
+            // Si solo hay un vértice, se queda en el centro
+            if (n > 1) {
+                double angulo = 2 * Math.PI * i / n - Math.PI / 2;
+                x += radioCirculo * Math.cos(angulo);
+                y += radioCirculo * Math.sin(angulo);
+            }
 
             int idActual = ids.get(i);
             VerticeGUI vGui = new VerticeGUI(idActual, radioVertice, x, y);
@@ -95,6 +125,9 @@ public class GrafoGUI {
         for (int i = 0; i < n; i++) {
             contenedor.getChildren().add(vertices.get(ids.get(i)).getContenedor());
         }
+
+        // Si había una ruta resaltada, se vuelve a pintar
+        pintarRuta();
     }
 
     /**
@@ -104,6 +137,9 @@ public class GrafoGUI {
         contenedor.getChildren().clear();
         vertices.clear();
         aristas.clear();
+        ids = new ArrayList<>();
+        conexiones = new int[0][3];
+        rutaActual = new ArrayList<>();
     }
 
     /**
@@ -128,26 +164,34 @@ public class GrafoGUI {
     }
 
     /**
-     * Metodo que resalta una ruta dada
+     * Metodo que resalta una ruta dada. Se recuerda para volver a pintarla
+     * si el dibujo se reacomoda al cambiar el tamaño de la ventana.
      * @param ruta Ruta que posee los ids de los vertices a resaltar
      */
     public void resaltarRuta(ArrayList<Integer> ruta) {
-        limpiarResaltado();
-        for (int i = 0; i < ruta.size(); i++) {
-            resaltarVertice(ruta.get(i), true);
-            if (i > 0) resaltarArista(ruta.get(i - 1), ruta.get(i), true);
-        }
+        rutaActual = new ArrayList<>(ruta);
+        pintarRuta();
     }
 
     /**
      * Metodo que limpia los vertices y aristas resaltados
      */
     public void limpiarResaltado() {
+        rutaActual = new ArrayList<>();
+        pintarRuta();
+    }
+
+    // Quita todo el resaltado y pinta solo el de la ruta guardada
+    private void pintarRuta() {
         for (VerticeGUI vertice : vertices.values()) {
             vertice.resaltar(false);
         }
         for (AristaGUI arista : aristas.values()) {
             arista.resaltar(false);
+        }
+        for (int i = 0; i < rutaActual.size(); i++) {
+            resaltarVertice(rutaActual.get(i), true);
+            if (i > 0) resaltarArista(rutaActual.get(i - 1), rutaActual.get(i), true);
         }
     }
 

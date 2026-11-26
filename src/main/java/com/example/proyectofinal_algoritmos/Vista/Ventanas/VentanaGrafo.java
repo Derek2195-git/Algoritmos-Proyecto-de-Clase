@@ -109,8 +109,10 @@ public class VentanaGrafo {
         if (owner != null) {
             ventana.initOwner(owner);
         }
+        Scene escena = new Scene(contenedor, 800, 600);
+        escena.getStylesheets().add(getClass().getResource("/recursos/estilos.css").toExternalForm());
         ventana.setTitle("Gestión y Visualización del Grafo");
-        ventana.setScene(new Scene(contenedor, 920, 540));
+        ventana.setScene(escena);
     }
 
     /**

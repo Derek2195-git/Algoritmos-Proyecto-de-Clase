@@ -38,8 +38,11 @@ public class VentanaAnalisis {
         if (owner != null) {
             ventana.initOwner(owner);
         }
+        Scene escena = new Scene(contenedor, 720, 540);
+        escena.getStylesheets().add(getClass().getResource("/recursos/estilos.css").toExternalForm());
+
         ventana.setTitle("Gráfica de Análisis Empírico");
-        ventana.setScene(new Scene(contenedor, 780, 440));
+        ventana.setScene(escena);
     }
 
     /**

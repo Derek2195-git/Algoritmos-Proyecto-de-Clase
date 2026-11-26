@@ -29,10 +29,10 @@ public class VerticeGUI {
         this.radio = radio;
 
         circulo = new Circle(radio);
-        circulo.setFill(Color.LIGHTBLUE);
-        circulo.setStroke(Color.STEELBLUE);
+        circulo.getStyleClass().add("vertice-circulo");
 
         textoId = new Label(String.valueOf(id));
+        textoId.getStyleClass().add("vertice-texto");
 
         contenedor = new StackPane(circulo, textoId);
         contenedor.setLayoutX(centroX - radio);
@@ -78,7 +78,12 @@ public class VerticeGUI {
      * @param activo Boolean que indica si el vertice debe ser resaltado o no
      */
     public void resaltar(boolean activo) {
-        circulo.setFill(activo ? Color.SEAGREEN : Color.LIGHTBLUE);
+        circulo.getStyleClass().remove("vertice-resaltado");
+        textoId.getStyleClass().remove("vertice-resaltado-texto");
+        if (activo) {
+            circulo.getStyleClass().add("vertice-resaltado");
+            textoId.getStyleClass().remove("vertice-resaltado-texto");
+        }
     }
 
     /**

@@ -30,7 +30,7 @@ public class SeccionSuperior {
     private ComboBox<String> cmbAlgoritmoOrdenamiento;
     private ComboBox<String> cmbCriterioOrdenamiento;
     private Button btnEjecutarOrdenamiento;
-    private Button btnAnalisisEmpirico;
+
 
     /**
      * Constructor de la sección superior de controles
@@ -83,6 +83,8 @@ public class SeccionSuperior {
         txtFinBusqueda.setPrefWidth(95);
 
         btnEjecutarBusqueda = new Button("Ejecutar Búsqueda");
+        cmbAlgoritmoBusqueda.setOnAction(e -> actualizarCampoFin());
+        actualizarCampoFin();
 
         cmbAlgoritmoOrdenamiento = new ComboBox<>();
         cmbAlgoritmoOrdenamiento.getItems().addAll("QuickSort", "Shell Sort");
@@ -93,18 +95,27 @@ public class SeccionSuperior {
         cmbCriterioOrdenamiento.getSelectionModel().selectFirst();
 
         btnEjecutarOrdenamiento = new Button("Ordenar");
-        btnAnalisisEmpirico = new Button("Análisis Empírico");
+
 
         HBox filaAlgoritmos = new HBox(8,
                 new Label("Búsqueda:"),
                 cmbAlgoritmoBusqueda, txtInicioBusqueda, txtFinBusqueda, btnEjecutarBusqueda,
                 new Label("Ordenar:"),
-                cmbAlgoritmoOrdenamiento, cmbCriterioOrdenamiento, btnEjecutarOrdenamiento,
-                btnAnalisisEmpirico
+                cmbAlgoritmoOrdenamiento, cmbCriterioOrdenamiento, btnEjecutarOrdenamiento
         );
         filaAlgoritmos.setAlignment(Pos.CENTER_LEFT);
 
         contenedor.getChildren().addAll(filaArchivos, filaAlgoritmos);
+    }
+
+    // Solo permite escribir el vértice destino cuando el algoritmo elegido es Dijkstra
+    private void actualizarCampoFin() {
+        String algoritmo = cmbAlgoritmoBusqueda.getValue();
+        boolean esDijkstra = algoritmo != null && algoritmo.startsWith("Dijkstra");
+        txtFinBusqueda.setDisable(!esDijkstra);
+        if (!esDijkstra) {
+            txtFinBusqueda.clear();
+        }
     }
 
     /**
@@ -156,12 +167,6 @@ public class SeccionSuperior {
      * @param accion Acción a realizar
      */
     public void alEjecutarOrdenamiento(Runnable accion) { btnEjecutarOrdenamiento.setOnAction(e -> accion.run()); }
-
-    /**
-     * Metodo que asigna la acción a realizar al presionar el botón de análisis empírico
-     * @param accion Acción a realizar
-     */
-    public void alEjecutarAnalisisEmpirico(Runnable accion) { btnAnalisisEmpirico.setOnAction(e -> accion.run()); }
 
     /**
      * Getter del texto ingresado en el campo de vértice inicial de búsqueda

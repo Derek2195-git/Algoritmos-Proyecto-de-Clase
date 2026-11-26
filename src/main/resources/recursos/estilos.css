@@ -1,35 +1,381 @@
-/* Estilos de la aplicación (clases definidas en las secciones de la vista) */
+.root {
+    -color-1: #282a36; /* Fondo y campos */
+    -color-2: #44475a; /* Secciones */
+    -color-3: #6272a4; /* Bordes, encabezados y líneas */
+    -color-4: #bd93f9; /* Púrpura: acción principal y selección */
+    -color-5: #ff79c6; /* Rosa: eliminar / avisos */
+    -color-6: #8be9fd; /* Cian: títulos */
+    -color-7: #f8f8f2; /* Texto claro */
+    -color-8: #50fa7b; /* Verde: ejecutar y resaltado */
 
-.ventana-principal {
-    -fx-background-color: #f4f6f9;
+    -fx-base: -color-2;
+    -fx-accent: -color-4;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-control-inner-background: -color-1;
+    -fx-control-inner-background-alt: -color-1;
 }
 
-.seccion-superior {
-    -fx-background-color: #ffffff;
-    -fx-border-color: transparent transparent #d9dee5 transparent;
+.label,
+.check-box {
+    -fx-text-fill: -color-7;
 }
 
-.titulo-seccion {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1f3a5f;
+.separator .line {
+    -fx-border-color: -color-3;
 }
 
-.button {
-    -fx-cursor: hand;
+/*  Ventanas y secciones  */
+.ventana-principal,
+.ventana-grafo,
+.ventana-analisis {
+    -fx-background-color: -color-1;
+}
+
+.seccion-superior,
+.seccion-tabla,
+.seccion-grafica,
+.seccion-resultados {
+    -fx-background-color: -color-2;
+    -fx-background-radius: 2;
+    -fx-border-color: -color-3;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
 }
 
 .area-resultados {
-    -fx-font-family: "Menlo", "Consolas", "Monospaced";
+    -fx-font-family: "Consolas", "Courier New", monospace;
     -fx-font-size: 12px;
 }
 
+.titulo-seccion {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-6;
+}
+
+/*  Cajas con el mismo aspecto (campos, tabla, dibujo)  */
+.text-field,
+.text-area,
+.combo-box,
+.tabla-grafo,
 .contenedor-grafo {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -color-1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-border-color: -color-3;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+}
+
+.text-field:focused,
+.text-area:focused,
+.combo-box:focused,
+.combo-box:hover {
+    -fx-border-color: -color-4;
 }
 
 .mensaje-aviso {
-    -fx-text-fill: #8a5a00;
-    -fx-font-size: 13px;
-    -fx-text-alignment: center;
+    -fx-background-color: -color-2;
+    -fx-border-color: -color-5;
+    -fx-border-width: 1;
+    -fx-padding: 8 10 8 10;
+    -fx-text-fill: -color-7;
+}
+
+/*  Botones  */
+.button {
+    -fx-background-color: -color-4;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-border-width: 0;
+    -fx-text-fill: -color-1;
+    -fx-padding: 5 12 5 12;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: derive(-color-4, 20%);
+}
+
+.button:pressed {
+    -fx-background-color: derive(-color-4, -15%);
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* Variantes opcionales (se activan con getStyleClass().add(...)) */
+.boton-accion {
+    -fx-background-color: -color-8;
+}
+
+.boton-accion:hover {
+    -fx-background-color: derive(-color-8, 20%);
+}
+
+.boton-accion:pressed {
+    -fx-background-color: derive(-color-8, -15%);
+}
+
+.boton-peligro {
+    -fx-background-color: -color-5;
+}
+
+.boton-peligro:hover {
+    -fx-background-color: derive(-color-5, 20%);
+}
+
+.boton-peligro:pressed {
+    -fx-background-color: derive(-color-5, -15%);
+}
+
+/*  Campos de texto  */
+.text-field,
+.text-area {
+    -fx-text-fill: -color-7;
+    -fx-highlight-fill: -color-3;
+    -fx-highlight-text-fill: -color-7;
+    -fx-prompt-text-fill: derive(-color-3, 25%);
+}
+
+.text-area .content {
+    -fx-background-color: -color-1;
+}
+
+.text-field {
+    -fx-padding: 4 6 4 6;
+}
+
+/*  CheckBox  */
+.check-box .box {
+    -fx-background-color: -color-1;
+    -fx-background-radius: 2;
+    -fx-border-color: -color-3;
+    -fx-border-radius: 2;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -color-8;
+    -fx-border-color: -color-8;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: -color-1;
+}
+
+/*  ComboBox  */
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-7;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow-button .arrow {
+    -fx-background-color: -color-7;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -color-1;
+    -fx-background-insets: 0;
+    -fx-border-color: -color-3;
+    -fx-border-width: 1;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: -color-1;
+    -fx-text-fill: -color-7;
+}
+
+.combo-box-popup .list-cell:filled:hover {
+    -fx-background-color: -color-3;
+}
+
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: -color-4;
+    -fx-text-fill: -color-1;
+}
+
+/*  Tabla  */
+.tabla-grafo .column-header-background,
+.tabla-grafo .column-header,
+.tabla-grafo .filler {
+    -fx-background-color: -color-3;
+    -fx-border-color: -color-2;
+    -fx-border-width: 0 1 1 0;
+}
+
+.tabla-grafo .column-header .label {
+    -fx-text-fill: -color-7;
+    -fx-font-weight: bold;
+}
+
+.tabla-grafo .table-row-cell {
+    -fx-background-color: -color-1;
+    -fx-background-insets: 0;
+    -fx-table-cell-border-color: -color-2;
+}
+
+.tabla-grafo .table-row-cell:selected {
+    -fx-background-color: -color-4;
+}
+
+.tabla-grafo .table-row-cell:empty {
+    -fx-background-color: -color-1;
+    -fx-table-cell-border-color: transparent;
+}
+
+.tabla-grafo .table-cell {
+    -fx-text-fill: -color-7;
+}
+
+.tabla-grafo .table-row-cell:selected .table-cell {
+    -fx-text-fill: -color-1;
+}
+
+/*  Barras de desplazamiento  */
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane > .corner,
+.scroll-bar {
+    -fx-background-color: -color-1;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar .track {
+    -fx-background-color: -color-2;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -color-3;
+    -fx-background-insets: 1;
+    -fx-background-radius: 2;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: -color-4;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: -color-2;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: -color-7;
+}
+
+/*  Gráfica de barras  */
+.grafica-barras,
+.Grafica-barras,
+.chart-plot-background {
+    -fx-background-color: -color-1;
+    -fx-border-width: 0;
+}
+
+.chart-title,
+.axis-label {
+    -fx-text-fill: -color-7;
+}
+
+.axis {
+    -fx-tick-label-fill: -color-7;
+    -fx-tick-mark-visible: false;
+    -fx-minor-tick-visible: false;
+}
+
+.chart-vertical-grid-lines,
+.chart-vertical-zero-line,
+.chart-horizontal-zero-line {
+    -fx-stroke: transparent;
+}
+
+.chart-alternative-row-fill,
+.chart-alternative-column-fill {
+    -fx-fill: transparent;
+}
+
+.chart-bar {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+}
+
+.default-color0.chart-bar,
+.default-color0.chart-legend-item-symbol {
+    -fx-bar-fill: -color-4;
+    -fx-background-color: -color-4;
+}
+
+.default-color1.chart-bar,
+.default-color1.chart-legend-item-symbol {
+    -fx-bar-fill: -color-5;
+    -fx-background-color: -color-5;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+/*  Vértices y aristas del grafo  */
+.vertice-circulo {
+    -fx-fill: -color-4;
+    -fx-stroke: -color-4;
+    -fx-font-weight: bold;
+    -fx-stroke-width: 1;
+}
+
+.vertice-circulo.vertice-resaltado {
+    -fx-fill: -color-8;
+    -fx-stroke: -color-8;
+    -fx-font-weight: bold;
+    -fx-stroke-width: 2;
+}
+
+.vertice-texto {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-1;
+}
+
+.vertice-texto-resaltado {
+    -fx-text-fill: -color-1;
+}
+
+.arista-linea {
+    -fx-stroke: -color-3;
+    -fx-stroke-width: 1;
+}
+
+.arista-flecha {
+    -fx-fill: -color-3;
+}
+
+.arista-peso {
+    -fx-fill: -color-7;
+    -fx-background-color: -color-1;
+    -fx-padding: 0 2 0 2;
+}
+
+.arista-resaltada .arista-linea {
+    -fx-stroke: -color-8;
+    -fx-stroke-width: 3;
+}
+
+.arista-resaltada .arista-flecha {
+    -fx-fill: -color-8;
+}
+
+.button:disabled,
+.text-field:disabled,
+.combo-box:disabled {
+    -fx-opacity: 0.5;
+}
+
+.etiqueta-barra {
+    -fx-fill: -color-7;
+    -fx-font-size: 11px;
 }
