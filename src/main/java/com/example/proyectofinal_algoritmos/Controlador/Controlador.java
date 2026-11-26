@@ -239,7 +239,15 @@ public class Controlador {
 
     // Abre la ventana secundaria donde se dibuja y edita el grafo
     private void manejarAbrirVentanaGrafo() {
-
+        refrescarDibujo();
+        ventana.getVentanaGrafo().mostrar();
+        aplicarEstilos(ventana.getVentanaGrafo().getContenedor().getScene());
+        Grafo grafo = grafoActivo();
+        MapaVertices mapa = mapaActivo();
+        if (grafo != null && mapa != null && grafo.cantidadVertices() <= MAX_VERTICES_DIBUJO
+                && tieneNombresNoNumericos(grafo, mapa)) {
+            ventana.getSeccionResultados().mostrarTexto(textoLeyenda(grafo, mapa));
+        }
     }
 
     // Corre BFS, DFS o Dijkstra sobre el grafo activo y resalta el resultado
@@ -261,59 +269,174 @@ public class Controlador {
 
     // Muestra la tabla de complejidad teorica en el area de resultados
     private void manejarVerComplejidad() {
-
+        StringBuilder sb = new StringBuilder("Complejidad teórica (V = vértices, E = aristas, n = elementos)\n\n");
+        sb.append(ComplejidadTeorica.generarTabla()).append('\n');
+        for (ComplejidadTeorica c : ComplejidadTeorica.values()) {
+            sb.append("- ").append(c.getNombre()).append(": ").append(c.getExplicacion()).append('\n');
+        }
+        ventana.getSeccionResultados().mostrarTexto(sb.toString());
     }
 
     // Limpia el texto del area de resultados
     private void manejarLimpiarResultados() {
-
+        ventana.getSeccionResultados().limpiar();
     }
 
     // Seccion de la ventana del grafo
 
     // Cambia la tabla para mostrar la lista de conexiones
     private void manejarVerConexiones() {
-
+        vistaTabla = VISTA_CONEXIONES;
+        refrescarTabla();
     }
 
     // Cambia la tabla para mostrar la matriz de adyacencia (si no pasa del limite)
     private void manejarVerMatriz() {
-
+        Grafo grafo = grafoActivo();
+        if (grafo != null && grafo.cantidadVertices() > MAX_VERTICES_MATRIZ) {
+            mostrarError("El grafo tiene " + grafo.cantidadVertices() + " vértices; la matriz solo se muestra hasta "
+                    + MAX_VERTICES_MATRIZ + ". Usa la lista de conexiones o la lista de adyacencia.");
+            return;
+        }
+        vistaTabla = VISTA_MATRIZ;
+        refrescarTabla();
     }
 
     // Agrega un vertice nuevo al grafo activo desde el campo Origen
     private void manejarAgregarVertice() {
+        String texto = ventana.getVentanaGrafo().getTextoOrigen();
+        if (texto.isEmpty()) {
+            mostrarError("Escribe en \"Origen\" el número (o nombre) del vértice a agregar.");
+            return;
+        }
+        Grafo grafo = asegurarGrafoActivo();
+        MapaVertices mapa = mapaActivo();
 
+        int id;
+        Integer numero = parsearEntero(texto);
+        if (numero != null) {
+            if (numero < 0) {
+                mostrarError("El número de vértice no puede ser negativo.");
+                return;
+            }
+            if (grafo.existeVertice(numero) || mapa.contieneNombre(texto)) {
+                mostrarError("El vértice " + texto + " ya existe.");
+                return;
+            }
+            id = numero;
+        } else {
+            if (mapa.contieneNombre(texto)) {
+                mostrarError("Ya existe un vértice llamado \"" + texto + "\".");
+                return;
+            }
+            id = siguienteIdLibre(grafo, mapa);
+            mapa.registrar(texto, id);
+        }
+        grafo.agregarVertice(id);
+        ventana.getVentanaGrafo().limpiarCampos();
+        refrescarVistas();
+        ventana.getSeccionResultados().mostrarTexto("Vértice " + nombre(id)
+                + (numero == null ? " (id " + id + ")" : "") + " agregado. Total de vértices: "
+                + grafo.cantidadVertices());
     }
 
     // Elimina un vertice y todas sus aristas del grafo activo
     private void manejarEliminarVertice() {
-
+        Grafo grafo = grafoActivo();
+        if (grafo == null) {
+            mostrarError("No hay un grafo activo.");
+            return;
+        }
+        String texto = ventana.getVentanaGrafo().getTextoOrigen();
+        Integer id = resolverVertice(texto);
+        if (id == null) {
+            mostrarError("Escribe en \"Origen\" un vértice existente para eliminarlo.");
+            return;
+        }
+        String nombreVertice = nombre(id);
+        grafo.eliminarVertice(id);
+        MapaVertices mapa = mapaActivo();
+        if (mapa.contieneId(id)) mapa.eliminar(mapa.getNombre(id));
+        ventana.getVentanaGrafo().limpiarCampos();
+        refrescarVistas();
+        ventana.getSeccionResultados().mostrarTexto("Vértice " + nombreVertice
+                + " eliminado junto con sus conexiones.");
     }
 
     // Agrega una arista entre origen y destino con el peso indicado
     private void manejarAgregarArista() {
-
+        int[] datos = leerArista(true);
+        if (datos == null) return;
+        Grafo grafo = grafoActivo();
+        if (grafo.existeArista(datos[0], datos[1])) {
+            mostrarError("La conexión " + nombre(datos[0]) + " - " + nombre(datos[1])
+                    + " ya existe. Usa \"Modificar Peso\" para cambiar su peso.");
+            return;
+        }
+        if (!grafo.agregarArista(datos[0], datos[1], datos[2])) {
+            mostrarError("No se pudo agregar la conexión.");
+            return;
+        }
+        refrescarVistas();
+        ventana.getSeccionResultados().mostrarTexto("Conexión " + nombre(datos[0])
+                + (grafo.isDirigido() ? " -> " : " - ") + nombre(datos[1]) + " con peso " + datos[2] + " agregada.");
     }
 
     // Cambia el peso de una arista que ya existe
     private void manejarModificarPeso() {
-
+        int[] datos = leerArista(true);
+        if (datos == null) return;
+        Grafo grafo = grafoActivo();
+        int anterior = grafo.obtenerPeso(datos[0], datos[1]);
+        if (!grafo.modificarPeso(datos[0], datos[1], datos[2])) {
+            mostrarError("No existe la conexión " + nombre(datos[0]) + " - " + nombre(datos[1]) + ".");
+            return;
+        }
+        refrescarVistas();
+        ventana.getSeccionResultados().mostrarTexto("Peso de " + nombre(datos[0]) + " - " + nombre(datos[1])
+                + " cambiado de " + anterior + " a " + datos[2] + ".");
     }
 
     // Elimina la arista entre origen y destino
     private void manejarEliminarArista() {
-
+        int[] datos = leerArista(false);
+        if (datos == null) return;
+        Grafo grafo = grafoActivo();
+        if (!grafo.existeArista(datos[0], datos[1])) {
+            mostrarError("No existe la conexión " + nombre(datos[0]) + " - " + nombre(datos[1]) + ".");
+            return;
+        }
+        grafo.eliminarArista(datos[0], datos[1]);
+        refrescarVistas();
+        ventana.getSeccionResultados().mostrarTexto("Conexión " + nombre(datos[0]) + " - "
+                + nombre(datos[1]) + " eliminada.");
     }
 
     // Al hacer clic en un vertice del dibujo, llena origen o destino automaticamente
     private void manejarSeleccionVertice(int valor) {
+        String origen = ventana.getVentanaGrafo().getTextoOrigen();
+        String destino = ventana.getVentanaGrafo().getTextoDestino();
+        String nombreVertice = nombre(valor);
 
+        // Primer clic llena origen, segundo clic llena destino y al tercero reinicia
+        if (origen.isEmpty() || !destino.isEmpty()) {
+            ventana.getVentanaGrafo().setTextoOrigen(nombreVertice);
+            ventana.getVentanaGrafo().setTextoDestino("");
+            ventana.getVentanaGrafo().setTextoPeso("");
+            return;
+        }
+        ventana.getVentanaGrafo().setTextoDestino(nombreVertice);
+        Integer idOrigen = resolverVertice(origen);
+        Grafo grafo = grafoActivo();
+        if (grafo != null && idOrigen != null && grafo.existeArista(idOrigen, valor)) {
+            ventana.getVentanaGrafo().setTextoPeso(String.valueOf(grafo.obtenerPeso(idOrigen, valor)));
+        }
     }
 
     // Cambia la tabla para mostrar la lista de adyacencia del grafo activo
     private void manejarVerListaAdyacencia() {
-
+        vistaTabla = VISTA_LISTA;
+        refrescarTabla();
     }
 
     // Metodos auxiliares
@@ -331,6 +454,14 @@ public class Controlador {
             mapas.put(grafo.getNombre(), mapa);
         }
         return mapa;
+    }
+
+    // Si no hay grafo activo, crea uno vacio para poder agregar vertices a mano
+    private Grafo asegurarGrafoActivo() {
+        if (grafoActivo() == null) {
+            registrarGrafo(new Grafo("Manual", ventana.getSeccionSuperior().esDirigido()), new MapaVertices());
+        }
+        return grafoActivo();
     }
 
     // Registra el grafo con un nombre unico, lo deja activo y actualiza la tabla y el dibujo
@@ -407,6 +538,47 @@ public class Controlador {
         return null;
     }
 
+    // Lee y valida origen, destino y peso desde los campos de la ventana del grafo
+    private int[] leerArista(boolean conPeso) {
+        Grafo grafo = grafoActivo();
+        if (grafo == null) {
+            mostrarError("No hay un grafo activo. Agrega vértices primero.");
+            return null;
+        }
+        String textoOrigen = ventana.getVentanaGrafo().getTextoOrigen();
+        String textoDestino = ventana.getVentanaGrafo().getTextoDestino();
+        Integer origen = resolverVertice(textoOrigen);
+        Integer destino = resolverVertice(textoDestino);
+        if (origen == null || destino == null) {
+            mostrarError("El vértice " + (origen == null ? "de origen \"" + textoOrigen : "de destino \"" + textoDestino)
+                    + "\" no existe. Agrégalo primero con \"+ Vértice\".");
+            return null;
+        }
+        if (origen.equals(destino)) {
+            mostrarError("No se permiten conexiones de un vértice consigo mismo.");
+            return null;
+        }
+        int peso = 0;
+        if (conPeso) {
+            Integer p = parsearEntero(ventana.getVentanaGrafo().getTextoPeso());
+            if (p == null || p < 0) {
+                mostrarError("El peso debe ser un número entero no negativo.");
+                return null;
+            }
+            peso = p;
+        }
+        return new int[]{origen, destino, peso};
+    }
+
+    private int siguienteIdLibre(Grafo grafo, MapaVertices mapa) {
+        int id = 0;
+        for (int existente : grafo.obtenerIds()) {
+            if (existente >= id) id = existente + 1;
+        }
+        while (grafo.existeVertice(id) || mapa.contieneId(id)) id++;
+        return id;
+    }
+
     private int contarVerticesSinConexiones(Grafo grafo) {
         HashMap<Integer, Boolean> conectado = new HashMap<>();
         for (Arista a : grafo.obtenerAristas()) {
@@ -418,6 +590,13 @@ public class Controlador {
             if (!conectado.containsKey(id)) total++;
         }
         return total;
+    }
+
+    private boolean tieneNombresNoNumericos(Grafo grafo, MapaVertices mapa) {
+        for (int id : grafo.obtenerIds()) {
+            if (!mapa.getNombre(id).equals(String.valueOf(id))) return true;
+        }
+        return false;
     }
 
     // Arma la leyenda para saber que nombre corresponde a cada numero en el dibujo
