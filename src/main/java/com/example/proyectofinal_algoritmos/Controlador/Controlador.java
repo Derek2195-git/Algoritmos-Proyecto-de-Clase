@@ -21,7 +21,7 @@ public class Controlador {
 
     private void conectarEventosVista() {
 
-        // Acciones de los botones de la sección de arriba
+        // Acciones de los botones de la sección de arriba en la ventana principal
         ventana.getSeccionSuperior().alCargarCSV(this::manejarCargaCSV);
         ventana.getSeccionSuperior().alGuardarCSV(this::manejarGuardarCSV);
         ventana.getSeccionSuperior().alGenerarPrueba(this::manejarGeneracionGrafo);
@@ -31,7 +31,7 @@ public class Controlador {
         ventana.getSeccionSuperior().alEjecutarOrdenamiento(this::manejarEjecucionOrdenamiento);
         ventana.getSeccionSuperior().alEjecutarAnalisisEmpirico(this::manejarAnalisisEmpirico);
 
-        // Acciones de los botones de la parte de abajo
+        // Acciones de los botones de la parte de abajo en la ventana principal
         ventana.getSeccionResultados().alVerComplejidad(this::manejarVerComplejidad);
         ventana.getSeccionResultados().alLimpiar(this::manejarLimpiarResultados);
 
