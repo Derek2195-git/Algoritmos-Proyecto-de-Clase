@@ -1,5 +1,6 @@
 package com.example.proyectofinal_algoritmos.Controlador;
 
+import com.example.proyectofinal_algoritmos.Modelo.Analisis.AnalisisEmpirico;
 import com.example.proyectofinal_algoritmos.Modelo.Analisis.ComplejidadTeorica;
 import com.example.proyectofinal_algoritmos.Modelo.Analisis.Medicion;
 import com.example.proyectofinal_algoritmos.Modelo.Analisis.MedidorTiempos;
@@ -352,7 +353,38 @@ public class Controlador {
 
     // Corre las pruebas empiricas en segundo plano y abre la ventana con la grafica
     private void manejarAnalisisEmpirico() {
+        if (trabajando) {
+            mostrarError("Ya hay un análisis en ejecución, espera a que termine.");
+            return;
+        }
+        boolean dirigido = ventana.getSeccionSuperior().esDirigido();
+        File carpeta = new File(System.getProperty("user.dir"), "analisis_empirico");
+        AnalisisEmpirico analisis = new AnalisisEmpirico(gestor);
 
+        trabajando = true;
+        ventana.getSeccionResultados().mostrarTexto("Ejecutando análisis empírico ("
+                + (dirigido ? "grafos dirigidos" : "grafos no dirigidos") + ")...");
+
+        ejecutarConPilaGrande(() -> {
+            File resultados;
+            try {
+                resultados = analisis.ejecutar(carpeta, dirigido,
+                        mensaje -> Platform.runLater(() -> ventana.getSeccionResultados().agregarTexto(mensaje)));
+            } catch (IOException e) {
+                Platform.runLater(() -> {
+                    trabajando = false;
+                    mostrarError("No se pudo completar el análisis: " + e.getMessage());
+                });
+                return;
+            }
+            Platform.runLater(() -> {
+                trabajando = false;
+                mostrarResultadosAnalisis(analisis, resultados);
+            });
+        }, error -> {
+            trabajando = false;
+            mostrarError("Error durante el análisis: " + error);
+        });
     }
 
     // Seccion de resultados
@@ -803,6 +835,32 @@ public class Controlador {
         if (!rutaResaltada.isEmpty()) {
             ventana.getVentanaGrafo().resaltarRuta(rutaResaltada);
         }
+    }
+
+    private void mostrarResultadosAnalisis(AnalisisEmpirico analisis, File resultados) {
+        MedidorTiempos medidor = analisis.getMedidor();
+        StringBuilder sb = new StringBuilder("Análisis empírico terminado.\n\n");
+        sb.append(medidor.generarTabla()).append('\n');
+        sb.append("Archivos CSV de prueba generados:\n");
+        for (File f : analisis.getArchivosGenerados()) {
+            sb.append("  ").append(f.getAbsolutePath()).append('\n');
+        }
+        sb.append("Mediciones exportadas a: ").append(resultados.getAbsolutePath()).append('\n');
+        ventana.getSeccionResultados().mostrarTexto(sb.toString());
+
+        // Grafica: una barra por algoritmo y tamanio de grafo
+        String[] algoritmos = {MedidorTiempos.IMPORTACION_TOTAL, AnalisisEmpirico.BFS, AnalisisEmpirico.DFS,
+                AnalisisEmpirico.DIJKSTRA, OrdenadorConexiones.QUICKSORT, OrdenadorConexiones.SHELL_SORT};
+        ArrayList<String> etiquetas = new ArrayList<>();
+        ArrayList<Double> valores = new ArrayList<>();
+        for (String algoritmo : algoritmos) {
+            for (Medicion m : medidor.filtrarPorAlgoritmo(algoritmo)) {
+                etiquetas.add(algoritmo + " " + AnalisisEmpirico.etiquetaDatos(m));
+                valores.add(m.getTiempoMilisegundos());
+            }
+        }
+        ventana.getVentanaAnalisis().actualizarDatos(etiquetas, valores);
+        ventana.getVentanaAnalisis().mostrar();
     }
 
     // Corre una tarea en otro hilo con pila grande para que no se trabe la interfaz ni de StackOverflow
