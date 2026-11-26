@@ -49,6 +49,7 @@ public class Tabla {
 
     public void mostrarListaAdyacencia(ArrayList<ArrayList<String>> filas) {
         tablaView.getColumns().clear();
+        tablaView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<ArrayList<String>, String> colVertice = new TableColumn<>("Vértice");
         colVertice.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(0)));
@@ -69,6 +70,7 @@ public class Tabla {
      */
     private void cargarFilasAristas(ArrayList<ArrayList<String>> filas) {
         tablaView.getColumns().clear();
+        tablaView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<ArrayList<String>, String> colOrigen = new TableColumn<>("Origen");
         colOrigen.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(0)));
@@ -88,15 +90,19 @@ public class Tabla {
 
     public void mostrarMatriz(ArrayList<Integer> ids, ArrayList<ArrayList<String>> filas) {
         tablaView.getColumns().clear();
+        // Se deja ancho fijo por columna para que no se aplasten cuando hay muchos vertices
+        tablaView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         TableColumn<ArrayList<String>, String> colCabecera = new TableColumn<>("Vértice");
         colCabecera.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(0)));
+        colCabecera.setPrefWidth(110);
         tablaView.getColumns().add(colCabecera);
 
         for (int j = 0; j < ids.size(); j++) {
             final int indiceColumna = j + 1;
             TableColumn<ArrayList<String>, String> col = new TableColumn<>(String.valueOf(ids.get(j)));
             col.setCellValueFactory(dato -> new SimpleStringProperty(dato.getValue().get(indiceColumna)));
+            col.setPrefWidth(55);
             tablaView.getColumns().add(col);
         }
 
