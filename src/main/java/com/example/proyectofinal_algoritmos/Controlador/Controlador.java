@@ -252,12 +252,102 @@ public class Controlador {
 
     // Corre BFS, DFS o Dijkstra sobre el grafo activo y resalta el resultado
     private void manejarEjecucionBusqueda() {
+        Grafo grafo = grafoActivo();
+        if (grafo == null) {
+            mostrarError("No hay un grafo activo. Carga, genera o crea uno primero.");
+            return;
+        }
+        String algoritmo = ventana.getSeccionSuperior().getBusquedaSeleccionada();
+        String textoInicio = ventana.getSeccionSuperior().getTextoInicioBusqueda();
+        Integer inicio = resolverVertice(textoInicio);
+        if (inicio == null) {
+            mostrarError("El vértice inicial \"" + textoInicio + "\" no existe en el grafo.");
+            return;
+        }
 
+        if (algoritmo != null && algoritmo.startsWith("Dijkstra")) {
+            String textoFin = ventana.getSeccionSuperior().getTextoFinBusqueda();
+            Integer fin = resolverVertice(textoFin);
+            if (fin == null) {
+                mostrarError("Para Dijkstra escribe un vértice destino que exista (\"" + textoFin + "\" no existe).");
+                return;
+            }
+            long t0 = System.nanoTime();
+            ResultadoRuta ruta = Dijkstra.calcular(grafo, inicio, fin);
+            long tiempo = System.nanoTime() - t0;
+
+            StringBuilder sb = new StringBuilder("Dijkstra (ruta óptima)\n");
+            sb.append("Vértice de origen: ").append(nombre(inicio)).append('\n');
+            sb.append("Vértice de destino: ").append(nombre(fin)).append('\n');
+            if (ruta.existeRuta()) {
+                sb.append("Secuencia de la ruta: ").append(unirNombres(ruta.getRuta(), " -> ")).append('\n');
+                sb.append("Costo total del recorrido: ").append(ruta.getCostoTotal()).append('\n');
+                resaltar(ruta.getRuta());
+            } else {
+                sb.append("No existe una ruta entre esos vértices.\n");
+                resaltar(new ArrayList<>());
+            }
+            sb.append(String.format(Locale.US, "Tiempo: %.4f ms", tiempo / 1_000_000.0));
+            ventana.getSeccionResultados().mostrarTexto(sb.toString());
+            return;
+        }
+
+        boolean esDfs = algoritmo != null && algoritmo.startsWith("DFS");
+        long t0 = System.nanoTime();
+        ArrayList<Integer> orden = esDfs ? Busquedas.dfs(grafo, inicio) : Busquedas.bfs(grafo, inicio);
+        long tiempo = System.nanoTime() - t0;
+
+        resaltar(orden);
+        ventana.getSeccionResultados().mostrarTexto(String.format(Locale.US,
+                "%s desde el vértice %s%nOrden de visita: %s%nVértices visitados: %d de %d%nTiempo: %.4f ms",
+                esDfs ? "DFS (búsqueda en profundidad)" : "BFS (búsqueda en anchura)",
+                nombre(inicio), unirNombres(orden, ", "), orden.size(), grafo.cantidadVertices(),
+                tiempo / 1_000_000.0));
     }
 
     // Ordena las conexiones del grafo con QuickSort o Shell Sort y las muestra en la tabla
     private void manejarEjecucionOrdenamiento() {
+        Grafo grafo = grafoActivo();
+        if (grafo == null) {
+            mostrarError("No hay un grafo activo. Carga, genera o crea uno primero.");
+            return;
+        }
+        if (trabajando) return;
 
+        String algoritmoElegido = ventana.getSeccionSuperior().getOrdenamientoSeleccionado();
+        String algoritmo = "Shell Sort".equals(algoritmoElegido)
+                ? OrdenadorConexiones.SHELL_SORT : OrdenadorConexiones.QUICKSORT;
+        boolean porPeso = !"Por Nombre de Vértice".equals(ventana.getSeccionSuperior().getCriterioOrdenamiento());
+        int criterio = porPeso ? ConexionOrdenable.POR_PESO : ConexionOrdenable.POR_NOMBRE;
+
+        ConexionOrdenable[] arreglo = OrdenadorConexiones.crearArreglo(grafo, this::nombre, criterio);
+
+        // Corre en un hilo con pila grande por si QuickSort recursivo recibe datos casi ordenados
+        trabajando = true;
+        ejecutarConPilaGrande(() -> {
+            long t0 = System.nanoTime();
+            ordenador.ordenar(arreglo, algoritmo);
+            long tiempo = System.nanoTime() - t0;
+
+            Platform.runLater(() -> {
+                trabajando = false;
+                ArrayList<ArrayList<String>> filas = new ArrayList<>();
+                for (ConexionOrdenable c : arreglo) {
+                    filas.add(fila(c.getNombreOrigen(), c.getNombreDestino(), String.valueOf(c.getPeso())));
+                }
+                vistaTabla = VISTA_CONEXIONES;
+                ventana.getSeccionTabla().getTabla().mostrarConexiones(filas);
+                ventana.getSeccionTabla().setTitulo("Conexiones ordenadas " + (porPeso ? "por peso" : "por nombre de vértice")
+                        + " (" + algoritmo + ")");
+                ventana.getSeccionResultados().mostrarTexto(String.format(Locale.US,
+                        "%s ordenó %d conexiones %s.%nTiempo: %.4f ms",
+                        algoritmo, arreglo.length, porPeso ? "por peso" : "por nombre de vértice",
+                        tiempo / 1_000_000.0));
+            });
+        }, error -> {
+            trabajando = false;
+            mostrarError("Error al ordenar: " + error);
+        });
     }
 
     // Corre las pruebas empiricas en segundo plano y abre la ventana con la grafica
@@ -592,6 +682,15 @@ public class Controlador {
         return total;
     }
 
+    private String unirNombres(ArrayList<Integer> ids, String separador) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ids.size(); i++) {
+            if (i > 0) sb.append(separador);
+            sb.append(nombre(ids.get(i)));
+        }
+        return sb.toString();
+    }
+
     private boolean tieneNombresNoNumericos(Grafo grafo, MapaVertices mapa) {
         for (int id : grafo.obtenerIds()) {
             if (!mapa.getNombre(id).equals(String.valueOf(id))) return true;
@@ -619,6 +718,12 @@ public class Controlador {
         rutaResaltada = new ArrayList<>();
         refrescarTabla();
         refrescarDibujo();
+    }
+
+    // Resalta una ruta en el dibujo y la guarda para repintarla si se redibuja
+    private void resaltar(ArrayList<Integer> ruta) {
+        rutaResaltada = ruta;
+        ventana.getVentanaGrafo().resaltarRuta(ruta);
     }
 
     // Vuelve a llenar la tabla segun la vista seleccionada (conexiones, lista o matriz)
@@ -698,6 +803,20 @@ public class Controlador {
         if (!rutaResaltada.isEmpty()) {
             ventana.getVentanaGrafo().resaltarRuta(rutaResaltada);
         }
+    }
+
+    // Corre una tarea en otro hilo con pila grande para que no se trabe la interfaz ni de StackOverflow
+    private void ejecutarConPilaGrande(Runnable trabajo, java.util.function.Consumer<String> alFallar) {
+        Thread hilo = new Thread(null, () -> {
+            try {
+                trabajo.run();
+            } catch (Throwable t) {
+                String mensaje = t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
+                Platform.runLater(() -> alFallar.accept(mensaje));
+            }
+        }, "trabajo-algoritmos", TAMANIO_PILA);
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
     private void mostrarError(String mensaje) {
